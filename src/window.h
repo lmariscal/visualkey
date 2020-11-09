@@ -12,6 +12,7 @@ namespace visualkey {
 
   WindowData* WindowCreate(u32 width, u32 height, std::string title); // Reverse name due to Windows already cotaining a func with that name
   GLFWwindow* GetFocusedWindow();
+  GLFWwindow* GetDefaultWindow();
   void DestroyWindow(WindowData *data);
   void MakeCurrent(WindowData *data);
   void InitGFX();

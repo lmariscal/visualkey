@@ -131,7 +131,7 @@ if(WIN32)
   file(RENAME "${CMAKE_BINARY_DIR}/bin" "${CMAKE_BINARY_DIR}/dist/mono")
 endif()
 
-# Compile C# lib
+# Compile C# api
 
 file(MAKE_DIRECTORY ${CMAKE_BINARY_DIR}/dist/api)
 file(GLOB_RECURSE VISUALKEY_CS_SOURCES LIST_DIRECTORIES false "${CMAKE_SOURCE_DIR}/csharp/*.cs")
@@ -142,15 +142,26 @@ else()
 endif()
 message("MCS ${MCS}")
 
-add_custom_target(visualkey_cs ALL DEPENDS ${CMAKE_BINARY_DIR}/dist/api/VisualKey.dll)
+file(MAKE_DIRECTORY ${CMAKE_BINARY_DIR}/dist/api/Debug)
+add_custom_target(visualkey_cs_debug ALL DEPENDS ${CMAKE_BINARY_DIR}/dist/api/Debug/VisualKey.dll)
 add_custom_command(
-  OUTPUT ${CMAKE_BINARY_DIR}/dist/api/VisualKey.dll;${CMAKE_BINARY_DIR}/dist/api/VisualKey.dll.mdb
-  COMMAND ${MCS} ${VISUALKEY_CS_SOURCES} /target:library /debug /optimize /out:${CMAKE_BINARY_DIR}/dist/api/VisualKey.dll /nologo /w:4
+  OUTPUT ${CMAKE_BINARY_DIR}/dist/api/Debug/VisualKey.dll;${CMAKE_BINARY_DIR}/dist/api/Debug/VisualKey.dll.mdb;${CMAKE_BINARY_DIR}/dist/api/Debug/VisualKey.xml
+  COMMAND ${MCS} ${VISUALKEY_CS_SOURCES} /target:library /debug /doc:${CMAKE_BINARY_DIR}/dist/api/Debug/VisualKey.xml /out:${CMAKE_BINARY_DIR}/dist/api/Debug/VisualKey.dll /nologo /w:3
   DEPENDS ${VISUALKEY_CS_SOURCES}
   VERBATIM
 )
 
-add_dependencies(visualkey visualkey_cs)
+file(MAKE_DIRECTORY ${CMAKE_BINARY_DIR}/dist/api/Release)
+add_custom_target(visualkey_cs_release ALL DEPENDS ${CMAKE_BINARY_DIR}/dist/api/Release/VisualKey.dll)
+add_custom_command(
+  OUTPUT ${CMAKE_BINARY_DIR}/dist/api/Release/VisualKey.dll;${CMAKE_BINARY_DIR}/dist/api/Release/VisualKey.dll.mdb;${CMAKE_BINARY_DIR}/dist/api/Release/VisualKey.xml
+  COMMAND ${MCS} ${VISUALKEY_CS_SOURCES} /target:library /debug /doc:${CMAKE_BINARY_DIR}/dist/api/Release/VisualKey.xml /optimize /out:${CMAKE_BINARY_DIR}/dist/api/Release/VisualKey.dll /nologo /w:4
+  DEPENDS ${VISUALKEY_CS_SOURCES}
+  VERBATIM
+)
+
+add_dependencies(visualkey visualkey_cs_debug)
+add_dependencies(visualkey visualkey_cs_release)
 
 # etc/
 

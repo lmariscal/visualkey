@@ -51,7 +51,11 @@ namespace visualkey {
       path += "/";
 
 #if defined(WIN32) || defined(_WIN32)
-    std::string command = ExePath() + "/../mono/mcs " + path + "*.cs /out:" + path + "App.dll /target:library /debug /optimize /w:4 /nologo /reference:" + ExePath() + "/../api/VisualKey.dll";
+#if defined(VISUALKEY_DEBUG)
+    std::string command = ExePath() + "/../mono/mcs " + path + "*.cs /out:" + path + "App.dll /target:library /debug /optimize /w:4 /nologo /reference:" + ExePath() + "/../api/Debug/VisualKey.dll";
+#else
+    std::string command = ExePath() + "/../mono/mcs " + path + "*.cs /out:" + path + "App.dll /target:library /debug /optimize /w:4 /nologo /reference:" + ExePath() + "/../api/Release/VisualKey.dll";
+#endif
     i32 ret = system(command.c_str());
     if (ret != 0) {
       std::cerr << "Failed to compile\nExiting program...\n";
@@ -59,7 +63,11 @@ namespace visualkey {
       exit(1);
     }
 #elif defined(__linux__)
-    std::string command = "mcs " + path + "*.cs /out:" + path + "App.dll /target:library /debug /optimize /w:4 /nologo /reference:" + ExePath() + "/../api/VisualKey.dll";
+#if defined(VISUALKEY_DEBUG)
+    std::string command = "mcs " + path + "*.cs /out:" + path + "App.dll /target:library /debug /optimize /w:4 /nologo /reference:" + ExePath() + "/../api/Debug/VisualKey.dll";
+#else
+    std::string command = "mcs " + path + "*.cs /out:" + path + "App.dll /target:library /debug /optimize /w:4 /nologo /reference:" + ExePath() + "/../api/Release/VisualKey.dll";
+#endif
     i32 ret = system(command.c_str());
     if (ret != 0) {
       std::cerr << "Failed to compile\nExiting program...\n";
@@ -93,7 +101,7 @@ namespace visualkey {
       return;
     }
 
-    std::string lib = ExePath() + "/../api/VisualKey.dll";
+    std::string lib = ExePath() + "/../api/Release/VisualKey.dll";
 
     lib_assembly = mono_domain_assembly_open(domain, lib.c_str());
     if (!lib_assembly) {

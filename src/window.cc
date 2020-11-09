@@ -188,7 +188,7 @@ namespace visualkey {
     if (glfwInit() != GLFW_TRUE) {
       std::cerr << "Failed to init GLFW\n";
       return;
-   }
+    }
     glfwSetErrorCallback(GLFWErrorCallback);
 
     glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 3);
@@ -240,6 +240,11 @@ namespace visualkey {
     return focused_window;
   }
 
+  GLFWwindow*
+  GetDefaultWindow() {
+    return default_window;
+  }
+
   void
   NewFrame() {
     glfwPollEvents();
@@ -286,6 +291,7 @@ namespace visualkey {
 
   bool
   WindowIsOpen(GLFWwindow *window) {
+    if (!window) return false;
     return !glfwWindowShouldClose(window);
   }
 

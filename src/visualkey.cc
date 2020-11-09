@@ -13,7 +13,7 @@ using namespace visualkey;
 i32
 main(i32 argc, char const **argv) {
  if (argc == 1) {
-    std::cout << "\n\
+    std::cout << "\
 Usage:\n\
   visualkey [DIRECTORY]\n\
 ";
