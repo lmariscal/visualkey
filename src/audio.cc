@@ -13,16 +13,17 @@ namespace visualkey {
 
   void
   InitAudio(std::string project_dir) {
-    soundEngine = irrklang::createIrrKlangDevice(irrklang::ESOD_AUTO_DETECT, irrklang::ESEO_MULTI_THREADED | irrklang::ESEO_LOAD_PLUGINS | irrklang::ESEO_USE_3D_BUFFERS | irrklang::ESEO_MUTE_IF_NOT_FOCUSED);
+    soundEngine = irrklang::createIrrKlangDevice(
+      irrklang::ESOD_AUTO_DETECT,
+      irrklang::ESEO_MULTI_THREADED | irrklang::ESEO_LOAD_PLUGINS | irrklang::ESEO_USE_3D_BUFFERS |
+        irrklang::ESEO_MUTE_IF_NOT_FOCUSED);
     dir = project_dir;
-    if (dir.at(dir.size() - 1) != '/' && dir.at(dir.size() - 1) != '\\')
-      dir += "/";
+    if (dir.at(dir.size() - 1) != '/' && dir.at(dir.size() - 1) != '\\') dir += "/";
   }
 
   void
   PlayAudio(std::string path, bool loop) {
-    if (!std::filesystem::exists(dir + path))
-      std::cerr << path << " could not be found\n";
+    if (!std::filesystem::exists(dir + path)) std::cerr << path << " could not be found\n";
     soundEngine->play2D(std::string(dir + path).c_str(), loop);
   }
 

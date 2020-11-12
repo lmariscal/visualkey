@@ -9,9 +9,9 @@
 namespace visualkey {
 
   ShaderData *current = new ShaderData();
-  u32 uber_shader = 0;
+  u32 uber_shader     = 0;
 
-  ShaderData*
+  ShaderData *
   GetCurrentShader() {
     return current;
   }
@@ -31,7 +31,7 @@ namespace visualkey {
     return uber_shader;
   }
 
-  ShaderSource*
+  ShaderSource *
   ReadShader(std::string path, ShaderType initial_type) {
     ShaderSource *source = new ShaderSource();
     std::stringstream source_stream[2];
@@ -46,26 +46,24 @@ namespace visualkey {
     }
 
     ShaderType type = initial_type;
-    i32 line_count = 0;
+    i32 line_count  = 0;
 
     while (getline(file, line)) {
       line_count++;
 
-      if (line.find("//") == 0)
-        continue;
-      if (line == "")
-        continue;
+      if (line.find("//") == 0) continue;
+      if (line == "") continue;
 
       if (line[0] == '#') {
         if (line.find("#include ") != std::string::npos) {
-          std::string include_path = line.substr(9, line.length());
+          std::string include_path     = line.substr(9, line.length());
           ShaderSource *include_source = ReadShader(directory + include_path, ShaderType::Vertex);
           if (!include_source) {
-            std::cerr << "Failed to include " << directory + include_path << "\n\tshader " << path << ":" << line_count << '\n';
+            std::cerr << "Failed to include " << directory + include_path << "\n\tshader " << path
+                      << ":" << line_count << '\n';
             continue;
           }
-          if (type != ShaderType::None)
-            source_stream[(i32)type] << include_source->vertex << '\n';
+          if (type != ShaderType::None) source_stream[(i32)type] << include_source->vertex << '\n';
           delete include_source;
           continue;
         } else if (line.find("#vertex") != std::string::npos) {
@@ -80,8 +78,7 @@ namespace visualkey {
         }
       }
 
-      if (type != ShaderType::None)
-        source_stream[(i32)type] << line << '\n';
+      if (type != ShaderType::None) source_stream[(i32)type] << line << '\n';
     }
 
     file.close();
@@ -89,16 +86,16 @@ namespace visualkey {
     std::cout << "Loaded shader \"" << path << "\"\n";
 #endif
 
-    source->vertex = source_stream[0].str();
+    source->vertex   = source_stream[0].str();
     source->fragment = source_stream[1].str();
     return source;
   }
 
-  ShaderSource*
+  ShaderSource *
   ReadShader(const std::string &vertex, const std::string &fragment) {
     ShaderSource *source = new ShaderSource();
-    source->vertex = vertex;
-    source->fragment = fragment;
+    source->vertex       = vertex;
+    source->fragment     = fragment;
     return source;
   }
 
@@ -106,8 +103,7 @@ namespace visualkey {
   StatusProgram(u32 program_id) {
     i32 status;
     glGetProgramiv(program_id, GL_LINK_STATUS, &status);
-    if (status == GL_TRUE)
-      return;
+    if (status == GL_TRUE) return;
 
     i32 log_length;
     glGetProgramiv(program_id, GL_INFO_LOG_LENGTH, &log_length);
@@ -122,8 +118,7 @@ namespace visualkey {
   StatusShader(u32 shader_id, ShaderType type) {
     i32 status;
     glGetShaderiv(shader_id, GL_COMPILE_STATUS, &status);
-    if (status == GL_TRUE)
-      return;
+    if (status == GL_TRUE) return;
 
     i32 log_length;
     glGetShaderiv(shader_id, GL_INFO_LOG_LENGTH, &log_length);
@@ -131,20 +126,22 @@ namespace visualkey {
     glGetShaderInfoLog(shader_id, log_length, nullptr, &message_array[0]);
     std::string message(begin(message_array), end(message_array));
 
-    std::cerr << "Failed to compile " << (type == ShaderType::Vertex ? "Vertex" : "Fragment") << " shader:\n" << message << '\n';
+    std::cerr << "Failed to compile " << (type == ShaderType::Vertex ? "Vertex" : "Fragment")
+              << " shader:\n"
+              << message << '\n';
   }
 
-  ShaderData*
+  ShaderData *
   CreateShader(ShaderSource *source) {
     ShaderData *data = new ShaderData();
 
-    u32 vertex = glCreateShader(GL_VERTEX_SHADER);
+    u32 vertex                = glCreateShader(GL_VERTEX_SHADER);
     const char *vertex_source = source->vertex.c_str();
     glShaderSource(vertex, 1, &vertex_source, nullptr);
     glCompileShader(vertex);
     StatusShader(vertex, ShaderType::Vertex);
 
-    u32 fragment = glCreateShader(GL_FRAGMENT_SHADER);
+    u32 fragment                = glCreateShader(GL_FRAGMENT_SHADER);
     const char *fragment_source = source->fragment.c_str();
     glShaderSource(fragment, 1, &fragment_source, nullptr);
     glCompileShader(fragment);
@@ -165,10 +162,10 @@ namespace visualkey {
     return data;
   }
 
-  ShaderData*
+  ShaderData *
   CreateShader(std::string path) {
     ShaderSource *source = ReadShader(path);
-    ShaderData *data = CreateShader(source);
+    ShaderData *data     = CreateShader(source);
     delete source;
     return data;
   }
@@ -178,8 +175,7 @@ namespace visualkey {
 #ifdef VISUALKEY_DEBUG
     std::cout << "Deleted shader " << data->program << "\n";
 #endif
-    if (!glfwGetCurrentContext())
-      return;
+    if (!glfwGetCurrentContext()) return;
     glDeleteProgram(data->program);
   }
 
@@ -196,8 +192,7 @@ namespace visualkey {
 #endif
     i32 pos = glGetUniformLocation(data->program, name.c_str());
 #ifdef VISUALKEY_DEBUG
-    if (pos == -1 && msg)
-      std::cerr << "Failed to locate \"" << name << "\" uniform\n";
+    if (pos == -1 && msg) std::cerr << "Failed to locate \"" << name << "\" uniform\n";
 #endif
     return pos;
   }

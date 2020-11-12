@@ -18,11 +18,11 @@ namespace visualkey {
     std::string::size_type pos = std::string(buffer).find_last_of("\\/");
     return std::string(buffer).substr(0, pos);
 #elif defined(__linux__)
-  char result[PATH_MAX];
-  ssize_t count = readlink("/proc/self/exe", result, PATH_MAX);
-  const char *path;
-  std::string::size_type pos = std::string(result).find_last_of("\\/");
-  return std::string(result).substr(0, pos);
+    char result[PATH_MAX];
+    ssize_t count = readlink("/proc/self/exe", result, PATH_MAX);
+    const char *path;
+    std::string::size_type pos = std::string(result).find_last_of("\\/");
+    return std::string(result).substr(0, pos);
 #else
     std::cerr << "Unsupported OS for ExePath\n";
 #endif

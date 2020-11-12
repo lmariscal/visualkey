@@ -13,8 +13,8 @@
 
 namespace visualkey {
 
-  f32 last_time = 0;
-  f32 delta_time = 0;
+  f32 last_time              = 0;
+  f32 delta_time             = 0;
   GLFWwindow *default_window = nullptr;
   GLFWwindow *focused_window = nullptr;
   std::vector<WindowData *> windows;
@@ -30,20 +30,19 @@ namespace visualkey {
     return is_ortho;
   }
 
-  GLFWmonitor*
+  GLFWmonitor *
   GetBestMonitor(GLFWwindow *window) {
     i32 monitor_count;
     GLFWmonitor **monitors = glfwGetMonitors(&monitor_count);
 
-    if (!monitors)
-      return nullptr;
+    if (!monitors) return nullptr;
 
     i32 window_x, window_y, window_width, window_height;
     glfwGetWindowSize(window, &window_width, &window_height);
     glfwGetWindowPos(window, &window_x, &window_y);
 
     GLFWmonitor *best_monitor = nullptr;
-    i32 best_area = 0;
+    i32 best_area             = 0;
 
     for (i32 i = 0; i < monitor_count; ++i) {
       GLFWmonitor *monitor = monitors[i];
@@ -52,8 +51,7 @@ namespace visualkey {
       glfwGetMonitorPos(monitor, &monitor_x, &monitor_y);
 
       const GLFWvidmode *mode = glfwGetVideoMode(monitor);
-      if (!mode)
-        continue;
+      if (!mode) continue;
 
       i32 area_min_x = MAX(window_x, monitor_x);
       i32 area_min_y = MAX(window_y, monitor_y);
@@ -64,7 +62,7 @@ namespace visualkey {
       i32 area = (area_max_x - area_min_x) * (area_max_y - area_min_y);
 
       if (area > best_area) {
-        best_area = area;
+        best_area    = area;
         best_monitor = monitor;
       }
     }
@@ -79,13 +77,19 @@ namespace visualkey {
 
   bool
   WindowFullscreen() {
-    GLFWwindow *window = glfwGetCurrentContext();
-    GLFWmonitor *current = glfwGetWindowMonitor(window);
-    GLFWmonitor *monitor = GetBestMonitor(window);
-    const GLFWvidmode* mode = glfwGetVideoMode(monitor);
+    GLFWwindow *window      = glfwGetCurrentContext();
+    GLFWmonitor *current    = glfwGetWindowMonitor(window);
+    GLFWmonitor *monitor    = GetBestMonitor(window);
+    const GLFWvidmode *mode = glfwGetVideoMode(monitor);
 
     if (current) {
-      glfwSetWindowMonitor(window, nullptr, (mode->width / 2) - (1280 / 2), (mode->height / 2) - (720 / 2), 1280, 720, GLFW_DONT_CARE);
+      glfwSetWindowMonitor(window,
+                           nullptr,
+                           (mode->width / 2) - (1280 / 2),
+                           (mode->height / 2) - (720 / 2),
+                           1280,
+                           720,
+                           GLFW_DONT_CARE);
       return false;
     }
 
@@ -94,7 +98,7 @@ namespace visualkey {
   }
 
   void
-  GLFWErrorCallback(i32 error, const char* description) {
+  GLFWErrorCallback(i32 error, const char *description) {
     std::cerr << description << "\n";
   }
 
@@ -110,18 +114,16 @@ namespace visualkey {
 
   void
   MouseEvent(GLFWwindow *window, f64 x, f64 y) {
-    if (!glfwGetWindowAttrib(window, GLFW_HOVERED))
-      return;
+    if (!glfwGetWindowAttrib(window, GLFW_HOVERED)) return;
     MouseEvent(x, y);
   }
 
   void
   FocusEvent(GLFWwindow *window, i32 focused) {
-    if (focused)
-      focused_window = window;
+    if (focused) focused_window = window;
   }
 
-  WindowData*
+  WindowData *
   WindowCreate(u32 width, u32 height, std::string title) {
     WindowData *data = new WindowData();
 
@@ -149,9 +151,11 @@ namespace visualkey {
     glfwSetWindowIcon(data->window, 1, &image);
     stbi_image_free(image.pixels);
 
-    GLFWmonitor *monitor = glfwGetPrimaryMonitor();
+    GLFWmonitor *monitor    = glfwGetPrimaryMonitor();
     const GLFWvidmode *mode = glfwGetVideoMode(monitor);
-    glfwSetWindowPos(data->window, (mode->width / 2) - (width / 2), (mode->height / 2) - (height / 2));
+    glfwSetWindowPos(data->window,
+                     (mode->width / 2) - (width / 2),
+                     (mode->height / 2) - (height / 2));
 
     glfwSetKeyCallback(data->window, KeyEvent);
     glfwSetMouseButtonCallback(data->window, MouseButtonEvent);
@@ -164,7 +168,7 @@ namespace visualkey {
     FocusEvent(data->window, 1);
 
     WindowData *copy = new WindowData();
-    copy->window = data->window;
+    copy->window     = data->window;
     windows.push_back(copy);
 
     return data;
@@ -179,8 +183,7 @@ namespace visualkey {
   DestroyWindow(WindowData *data) {
     glfwDestroyWindow(data->window);
     for (WindowData *window_data : windows)
-      if (window_data->window == data->window)
-        window_data->window = nullptr;
+      if (window_data->window == data->window) window_data->window = nullptr;
   }
 
   void
@@ -215,9 +218,11 @@ namespace visualkey {
     glfwSetWindowIcon(default_window, 1, &image);
     stbi_image_free(image.pixels);
 
-    GLFWmonitor *monitor = glfwGetPrimaryMonitor();
+    GLFWmonitor *monitor    = glfwGetPrimaryMonitor();
     const GLFWvidmode *mode = glfwGetVideoMode(monitor);
-    glfwSetWindowPos(default_window, (mode->width / 2) - (1280 / 2), (mode->height / 2) - (720 / 2));
+    glfwSetWindowPos(default_window,
+                     (mode->width / 2) - (1280 / 2),
+                     (mode->height / 2) - (720 / 2));
 
     glfwSetKeyCallback(default_window, KeyEvent);
     glfwSetMouseButtonCallback(default_window, MouseButtonEvent);
@@ -235,12 +240,12 @@ namespace visualkey {
     glEnable(GL_DEPTH_TEST);
   }
 
-  GLFWwindow*
+  GLFWwindow *
   GetFocusedWindow() {
     return focused_window;
   }
 
-  GLFWwindow*
+  GLFWwindow *
   GetDefaultWindow() {
     return default_window;
   }
@@ -250,9 +255,9 @@ namespace visualkey {
     glfwPollEvents();
     UpdatePads();
 
-    f32 now = glfwGetTime();
+    f32 now    = glfwGetTime();
     delta_time = now - last_time;
-    last_time = now;
+    last_time  = now;
   }
 
   void
@@ -263,8 +268,7 @@ namespace visualkey {
   void
   SwapAllBuffers() {
     for (WindowData *data : windows) {
-      if (data->window)
-        SwapBuffers(data->window);
+      if (data->window) SwapBuffers(data->window);
     }
   }
 

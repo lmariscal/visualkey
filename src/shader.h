@@ -1,14 +1,12 @@
 #pragma once
 
-#include "typedefs.h"
+#include "types.h"
 
 #include <vector>
 
 namespace visualkey {
 
-  enum class ShaderType : i32 {
-    None = -1, Vertex = 0, Fragment = 1
-  };
+  enum class ShaderType : i32 { None = -1, Vertex = 0, Fragment = 1 };
 
   struct ShaderSource {
     std::string vertex;
@@ -19,11 +17,11 @@ namespace visualkey {
     u32 program;
   };
 
-  ShaderSource* ReadShader(std::string path, ShaderType initial_type = ShaderType::None);
-  ShaderSource* ReadShader(const std::string &vertex, const std::string &fragment);
-  ShaderData* GetCurrentShader();
-  ShaderData* CreateShader(ShaderSource *source);
-  ShaderData* CreateShader(std::string path);
+  ShaderSource *ReadShader(std::string path, ShaderType initial_type = ShaderType::None);
+  ShaderSource *ReadShader(const std::string &vertex, const std::string &fragment);
+  ShaderData *GetCurrentShader();
+  ShaderData *CreateShader(ShaderSource *source);
+  ShaderData *CreateShader(std::string path);
   i32 GetLocation(ShaderData *data, const std::string &name, bool msg = true);
   u32 GetUberShader();
   void SetUberShader(ShaderData *data);

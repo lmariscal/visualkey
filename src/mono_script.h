@@ -1,6 +1,6 @@
 #pragma once
 
-#include "typedefs.h"
+#include "types.h"
 #include <mono/jit/jit.h>
 
 namespace visualkey {

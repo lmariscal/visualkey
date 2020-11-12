@@ -8,7 +8,7 @@
 
 namespace visualkey {
 
-  ImageData*
+  ImageData *
   CreateImage(std::string path) {
     ImageData *image_data = new ImageData();
     i32 width, height, channels;
@@ -35,8 +35,7 @@ namespace visualkey {
 
   void
   DestroyImage(ImageData *data) {
-    if (!glfwGetCurrentContext())
-      return;
+    if (!glfwGetCurrentContext()) return;
     glDeleteTextures(1, &data->texture);
   }
 

@@ -23,19 +23,18 @@
 namespace visualkey {
 
   std::string path;
-  MonoDomain *domain = nullptr;
-  MonoAssembly *assembly = nullptr;
-  MonoAssembly *lib_assembly = nullptr;
-  MonoImage *image = nullptr;
-  MonoImage *lib_image = nullptr;
+  MonoDomain *domain           = nullptr;
+  MonoAssembly *assembly       = nullptr;
+  MonoAssembly *lib_assembly   = nullptr;
+  MonoImage *image             = nullptr;
+  MonoImage *lib_image         = nullptr;
   MonoClass *application_class = nullptr;
-  MonoObject *application = nullptr;
+  MonoObject *application      = nullptr;
 
   void
   InitMono() {
     domain = mono_jit_init("VisualKey");
-    if (!domain)
-      std::cerr << "Failed to init mono_jit\n";
+    if (!domain) std::cerr << "Failed to init mono_jit\n";
     AddFeatures();
   }
 
@@ -47,14 +46,17 @@ namespace visualkey {
   void
   MonoCompile(std::string dir) {
     path = dir;
-    if (dir.at(dir.size() - 1) != '/' && dir.at(dir.size() - 1) != '\\')
-      path += "/";
+    if (dir.at(dir.size() - 1) != '/' && dir.at(dir.size() - 1) != '\\') path += "/";
 
 #if defined(WIN32) || defined(_WIN32)
 #if defined(VISUALKEY_DEBUG)
-    std::string command = ExePath() + "/../mono/mcs " + path + "*.cs /out:" + path + "App.dll /target:library /debug /optimize /w:4 /nologo /reference:" + ExePath() + "/../api/Debug/VisualKey.dll";
+    std::string command = ExePath() + "/../mono/mcs " + path + "*.cs /out:" + path +
+      "App.dll /target:library /debug /optimize /w:4 /nologo /reference:" + ExePath() +
+      "/../api/Debug/VisualKey.dll";
 #else
-    std::string command = ExePath() + "/../mono/mcs " + path + "*.cs /out:" + path + "App.dll /target:library /debug /optimize /w:4 /nologo /reference:" + ExePath() + "/../api/Release/VisualKey.dll";
+    std::string command = ExePath() + "/../mono/mcs " + path + "*.cs /out:" + path +
+      "App.dll /target:library /debug /optimize /w:4 /nologo /reference:" + ExePath() +
+      "/../api/Release/VisualKey.dll";
 #endif
     i32 ret = system(command.c_str());
     if (ret != 0) {
@@ -64,9 +66,13 @@ namespace visualkey {
     }
 #elif defined(__linux__)
 #if defined(VISUALKEY_DEBUG)
-    std::string command = "mcs " + path + "*.cs /out:" + path + "App.dll /target:library /debug /optimize /w:4 /nologo /reference:" + ExePath() + "/../api/Debug/VisualKey.dll";
+    std::string command = "mcs " + path + "*.cs /out:" + path +
+      "App.dll /target:library /debug /optimize /w:4 /nologo /reference:" + ExePath() +
+      "/../api/Debug/VisualKey.dll";
 #else
-    std::string command = "mcs " + path + "*.cs /out:" + path + "App.dll /target:library /debug /optimize /w:4 /nologo /reference:" + ExePath() + "/../api/Release/VisualKey.dll";
+    std::string command = "mcs " + path + "*.cs /out:" + path +
+      "App.dll /target:library /debug /optimize /w:4 /nologo /reference:" + ExePath() +
+      "/../api/Release/VisualKey.dll";
 #endif
     i32 ret = system(command.c_str());
     if (ret != 0) {
@@ -81,7 +87,8 @@ namespace visualkey {
     std::string name = path;
     name += "App.dll";
 
-    mono_set_dirs(std::string(ExePath() + "/../lib").c_str(), std::string(ExePath() + "/../etc").c_str());
+    mono_set_dirs(std::string(ExePath() + "/../lib").c_str(),
+                  std::string(ExePath() + "/../etc").c_str());
 
     mono_set_assemblies_path(ExePath().c_str());
 
@@ -134,16 +141,15 @@ namespace visualkey {
   MonoStart() {
     MonoMethodDesc *type_method_desc = nullptr;
     std::string type_method_desc_str = "App:Start()";
-    type_method_desc = mono_method_desc_new(type_method_desc_str.c_str(), false);
+    type_method_desc                 = mono_method_desc_new(type_method_desc_str.c_str(), false);
     if (!type_method_desc) {
       std::cerr << "Failed to get type_method_desc from mono_method_desc_new\n";
       return;
     }
 
     MonoMethod *method = nullptr;
-    method = mono_method_desc_search_in_image(type_method_desc, image);
-    if (!method)
-      return;
+    method             = mono_method_desc_search_in_image(type_method_desc, image);
+    if (!method) return;
 
     mono_runtime_invoke(method, application, nullptr, nullptr);
   }
@@ -152,16 +158,15 @@ namespace visualkey {
   MonoUpdate() {
     MonoMethodDesc *type_method_desc = nullptr;
     std::string type_method_desc_str = "App:Update()";
-    type_method_desc = mono_method_desc_new(type_method_desc_str.c_str(), false);
+    type_method_desc                 = mono_method_desc_new(type_method_desc_str.c_str(), false);
     if (!type_method_desc) {
       std::cerr << "Failed to get type_method_desc from mono_method_desc_new\n";
       return;
     }
 
     MonoMethod *method = nullptr;
-    method = mono_method_desc_search_in_image(type_method_desc, image);
-    if (!method)
-      return;
+    method             = mono_method_desc_search_in_image(type_method_desc, image);
+    if (!method) return;
 
     mono_runtime_invoke(method, application, nullptr, nullptr);
   }
@@ -170,16 +175,15 @@ namespace visualkey {
   MonoStop() {
     MonoMethodDesc *type_method_desc = nullptr;
     std::string type_method_desc_str = "App:Stop()";
-    type_method_desc = mono_method_desc_new(type_method_desc_str.c_str(), false);
+    type_method_desc                 = mono_method_desc_new(type_method_desc_str.c_str(), false);
     if (!type_method_desc) {
       std::cerr << "Failed to get type_method_desc from mono_method_desc_new\n";
       return;
     }
 
     MonoMethod *method = nullptr;
-    method = mono_method_desc_search_in_image(type_method_desc, image);
-    if (!method)
-      return;
+    method             = mono_method_desc_search_in_image(type_method_desc, image);
+    if (!method) return;
 
     mono_runtime_invoke(method, application, nullptr, nullptr);
   }
@@ -187,7 +191,7 @@ namespace visualkey {
   v2
   ToVec2(MonoObject *obj) {
     v2 result(0);
-    MonoClass *klass = mono_object_get_class(obj);
+    MonoClass *klass        = mono_object_get_class(obj);
     MonoClassField *field_x = mono_class_get_field_from_name(klass, "x");
     MonoClassField *field_y = mono_class_get_field_from_name(klass, "y");
 
@@ -204,7 +208,7 @@ namespace visualkey {
   v3
   ToVec3(MonoObject *obj) {
     v3 result(0);
-    MonoClass *klass = mono_object_get_class(obj);
+    MonoClass *klass        = mono_object_get_class(obj);
     MonoClassField *field_x = mono_class_get_field_from_name(klass, "x");
     MonoClassField *field_y = mono_class_get_field_from_name(klass, "y");
     MonoClassField *field_z = mono_class_get_field_from_name(klass, "z");
@@ -223,7 +227,7 @@ namespace visualkey {
   quat
   ToQuat(MonoObject *obj) {
     quat result;
-    MonoClass *klass = mono_object_get_class(obj);
+    MonoClass *klass        = mono_object_get_class(obj);
     MonoClassField *field_x = mono_class_get_field_from_name(klass, "x");
     MonoClassField *field_y = mono_class_get_field_from_name(klass, "y");
     MonoClassField *field_z = mono_class_get_field_from_name(klass, "z");
@@ -244,7 +248,7 @@ namespace visualkey {
   v4
   ToVec4(MonoObject *obj) {
     v4 result(0);
-    MonoClass *klass = mono_object_get_class(obj);
+    MonoClass *klass        = mono_object_get_class(obj);
     MonoClassField *field_x = mono_class_get_field_from_name(klass, "x");
     MonoClassField *field_y = mono_class_get_field_from_name(klass, "y");
     MonoClassField *field_z = mono_class_get_field_from_name(klass, "z");
@@ -265,9 +269,9 @@ namespace visualkey {
   m3
   ToMat3(MonoObject *obj) {
     m3 result(0);
-    MonoClass *klass = mono_object_get_class(obj);
+    MonoClass *klass     = mono_object_get_class(obj);
     MonoMethod *to_array = mono_class_get_method_from_name(klass, "ToArray", 0);
-    MonoArray *array = (MonoArray *)mono_runtime_invoke(to_array, obj, nullptr, nullptr);
+    MonoArray *array     = (MonoArray *)mono_runtime_invoke(to_array, obj, nullptr, nullptr);
 
     for (int i = 0; i < 3; ++i)
       for (int j = 0; j < 3; ++j)
@@ -279,9 +283,9 @@ namespace visualkey {
   m4
   ToMat4(MonoObject *obj) {
     m4 result(0);
-    MonoClass *klass = mono_object_get_class(obj);
+    MonoClass *klass     = mono_object_get_class(obj);
     MonoMethod *to_array = mono_class_get_method_from_name(klass, "ToArray", 0);
-    MonoArray *array = (MonoArray *)mono_runtime_invoke(to_array, obj, nullptr, nullptr);
+    MonoArray *array     = (MonoArray *)mono_runtime_invoke(to_array, obj, nullptr, nullptr);
 
     for (int i = 0; i < 4; ++i)
       for (int j = 0; j < 4; ++j)
@@ -290,10 +294,10 @@ namespace visualkey {
     return result;
   }
 
-  MonoObject*
+  MonoObject *
   FromVec2(v2 &vec) {
     MonoClass *vec2_klass = mono_class_from_name(lib_image, "VisualKey", "Vec2");
-    MonoObject *vec2_obj = mono_object_new(domain, vec2_klass);
+    MonoObject *vec2_obj  = mono_object_new(domain, vec2_klass);
 
     MonoClassField *field_x = mono_class_get_field_from_name(vec2_klass, "x");
     MonoClassField *field_y = mono_class_get_field_from_name(vec2_klass, "y");
@@ -303,10 +307,10 @@ namespace visualkey {
     return vec2_obj;
   }
 
-  MonoObject*
+  MonoObject *
   FromVec3(v3 &vec) {
     MonoClass *vec3_klass = mono_class_from_name(lib_image, "VisualKey", "Vec3");
-    MonoObject *vec3_obj = mono_object_new(domain, vec3_klass);
+    MonoObject *vec3_obj  = mono_object_new(domain, vec3_klass);
 
     MonoClassField *field_x = mono_class_get_field_from_name(vec3_klass, "x");
     MonoClassField *field_y = mono_class_get_field_from_name(vec3_klass, "y");
@@ -318,10 +322,10 @@ namespace visualkey {
     return vec3_obj;
   }
 
-  MonoObject*
+  MonoObject *
   FromVec4(v4 &vec) {
     MonoClass *vec4_klass = mono_class_from_name(lib_image, "VisualKey", "Vec4");
-    MonoObject *vec4_obj = mono_object_new(domain, vec4_klass);
+    MonoObject *vec4_obj  = mono_object_new(domain, vec4_klass);
 
     MonoClassField *field_x = mono_class_get_field_from_name(vec4_klass, "x");
     MonoClassField *field_y = mono_class_get_field_from_name(vec4_klass, "y");
@@ -335,10 +339,10 @@ namespace visualkey {
     return vec4_obj;
   }
 
-  MonoObject*
+  MonoObject *
   FromQuat(quat &q) {
     MonoClass *quat_klass = mono_class_from_name(lib_image, "VisualKey", "Quat");
-    MonoObject *quat_obj = mono_object_new(domain, quat_klass);
+    MonoObject *quat_obj  = mono_object_new(domain, quat_klass);
 
     MonoClassField *field_x = mono_class_get_field_from_name(quat_klass, "x");
     MonoClassField *field_y = mono_class_get_field_from_name(quat_klass, "y");
@@ -352,10 +356,10 @@ namespace visualkey {
     return quat_obj;
   }
 
-  MonoObject*
+  MonoObject *
   FromWindowData(WindowData *data) {
     MonoClass *window_klass = mono_class_from_name(lib_image, "VisualKey", "Window");
-    MonoObject *window_obj = mono_object_new(domain, window_klass);
+    MonoObject *window_obj  = mono_object_new(domain, window_klass);
 
     MonoClassField *field_window = mono_class_get_field_from_name(window_klass, "window");
     mono_field_set_value(window_obj, field_window, &data->window);
@@ -363,10 +367,10 @@ namespace visualkey {
     return window_obj;
   }
 
-  WindowData*
+  WindowData *
   ToWindowData(MonoObject *obj) {
-    WindowData *data = new WindowData();
-    MonoClass *klass = mono_object_get_class(obj);
+    WindowData *data             = new WindowData();
+    MonoClass *klass             = mono_object_get_class(obj);
     MonoClassField *field_window = mono_class_get_field_from_name(klass, "window");
 
     if (!field_window) {
@@ -381,10 +385,10 @@ namespace visualkey {
 
   void
   CreateWindowMono(u32 width, u32 height, MonoString *title, MonoObject *recipient) {
-    std::string u8_title = mono_string_to_utf8(title);
+    std::string u8_title    = mono_string_to_utf8(title);
     WindowData *window_data = WindowCreate(width, height, u8_title);
 
-    MonoClass *klass = mono_object_get_class(recipient);
+    MonoClass *klass             = mono_object_get_class(recipient);
     MonoClassField *field_window = mono_class_get_field_from_name(klass, "window");
     mono_field_set_value(recipient, field_window, &window_data->window);
 
@@ -405,16 +409,18 @@ namespace visualkey {
     delete window_data;
   }
 
-  MonoObject*
+  MonoObject *
   FromMeshData(MeshData *data) {
     MonoClass *mesh_klass = mono_class_from_name(lib_image, "VisualKey", "Mesh");
-    MonoObject *mesh_obj = mono_object_new(domain, mesh_klass);
+    MonoObject *mesh_obj  = mono_object_new(domain, mesh_klass);
 
-    MonoClassField *field_vao = mono_class_get_field_from_name(mesh_klass, "vao");
-    MonoClassField *field_vbo_array = mono_class_get_field_from_name(mesh_klass, "vboArray");
+    MonoClassField *field_vao         = mono_class_get_field_from_name(mesh_klass, "vao");
+    MonoClassField *field_vbo_array   = mono_class_get_field_from_name(mesh_klass, "vboArray");
     MonoClassField *field_vbo_element = mono_class_get_field_from_name(mesh_klass, "vboElement");
-    MonoClassField *field_vertices_count = mono_class_get_field_from_name(mesh_klass, "verticesCount");
-    MonoClassField *field_indices_count = mono_class_get_field_from_name(mesh_klass, "indicesCount");
+    MonoClassField *field_vertices_count =
+      mono_class_get_field_from_name(mesh_klass, "verticesCount");
+    MonoClassField *field_indices_count =
+      mono_class_get_field_from_name(mesh_klass, "indicesCount");
     MonoClassField *field_is_line = mono_class_get_field_from_name(mesh_klass, "isLine");
     mono_field_set_value(mesh_obj, field_vao, &data->vao);
     mono_field_set_value(mesh_obj, field_vbo_array, &data->vbo_array);
@@ -426,19 +432,20 @@ namespace visualkey {
     return mesh_obj;
   }
 
-  MeshData*
+  MeshData *
   ToMeshData(MonoObject *obj) {
-    MeshData *data = new MeshData();
+    MeshData *data   = new MeshData();
     MonoClass *klass = mono_object_get_class(obj);
 
-    MonoClassField *field_vao = mono_class_get_field_from_name(klass, "vao");
-    MonoClassField *field_vbo_array = mono_class_get_field_from_name(klass, "vboArray");
-    MonoClassField *field_vbo_element = mono_class_get_field_from_name(klass, "vboElement");
+    MonoClassField *field_vao            = mono_class_get_field_from_name(klass, "vao");
+    MonoClassField *field_vbo_array      = mono_class_get_field_from_name(klass, "vboArray");
+    MonoClassField *field_vbo_element    = mono_class_get_field_from_name(klass, "vboElement");
     MonoClassField *field_vertices_count = mono_class_get_field_from_name(klass, "verticesCount");
-    MonoClassField *field_indices_count = mono_class_get_field_from_name(klass, "indicesCount");
-    MonoClassField *field_is_line = mono_class_get_field_from_name(klass, "isLine");
+    MonoClassField *field_indices_count  = mono_class_get_field_from_name(klass, "indicesCount");
+    MonoClassField *field_is_line        = mono_class_get_field_from_name(klass, "isLine");
 
-    if (!field_vao || !field_vbo_array || !field_vbo_element || !field_vertices_count || !field_indices_count || !field_is_line) {
+    if (!field_vao || !field_vbo_array || !field_vbo_element || !field_vertices_count ||
+        !field_indices_count || !field_is_line) {
       std::cerr << "obj is not a Mesh\n";
       return data;
     }
@@ -454,7 +461,10 @@ namespace visualkey {
   }
 
   void
-  CreateMeshIndicesMono(MonoArray *vertices_array, MonoArray *indices_array, bool is_line, MonoObject *recipient) {
+  CreateMeshIndicesMono(MonoArray *vertices_array,
+                        MonoArray *indices_array,
+                        bool is_line,
+                        MonoObject *recipient) {
     i32 vertices_length = mono_array_length(vertices_array);
     std::vector<f32> vertices;
     for (i32 i = 0; i < vertices_length; ++i)
@@ -467,13 +477,13 @@ namespace visualkey {
 
     MeshData *mesh_data = CreateMesh(vertices, indices, is_line);
 
-    MonoClass *klass = mono_object_get_class(recipient);
-    MonoClassField *field_vao = mono_class_get_field_from_name(klass, "vao");
-    MonoClassField *field_vbo_array = mono_class_get_field_from_name(klass, "vboArray");
-    MonoClassField *field_vbo_element = mono_class_get_field_from_name(klass, "vboElement");
+    MonoClass *klass                     = mono_object_get_class(recipient);
+    MonoClassField *field_vao            = mono_class_get_field_from_name(klass, "vao");
+    MonoClassField *field_vbo_array      = mono_class_get_field_from_name(klass, "vboArray");
+    MonoClassField *field_vbo_element    = mono_class_get_field_from_name(klass, "vboElement");
     MonoClassField *field_vertices_count = mono_class_get_field_from_name(klass, "verticesCount");
-    MonoClassField *field_indices_count = mono_class_get_field_from_name(klass, "indicesCount");
-    MonoClassField *field_is_line = mono_class_get_field_from_name(klass, "isLine");
+    MonoClassField *field_indices_count  = mono_class_get_field_from_name(klass, "indicesCount");
+    MonoClassField *field_is_line        = mono_class_get_field_from_name(klass, "isLine");
 
     mono_field_set_value(recipient, field_vao, &mesh_data->vao);
     mono_field_set_value(recipient, field_vbo_array, &mesh_data->vbo_array);
@@ -494,13 +504,13 @@ namespace visualkey {
 
     MeshData *mesh_data = CreateMesh(vertices, is_line);
 
-    MonoClass *klass = mono_object_get_class(recipient);
-    MonoClassField *field_vao = mono_class_get_field_from_name(klass, "vao");
-    MonoClassField *field_vbo_array = mono_class_get_field_from_name(klass, "vboArray");
-    MonoClassField *field_vbo_element = mono_class_get_field_from_name(klass, "vboElement");
+    MonoClass *klass                     = mono_object_get_class(recipient);
+    MonoClassField *field_vao            = mono_class_get_field_from_name(klass, "vao");
+    MonoClassField *field_vbo_array      = mono_class_get_field_from_name(klass, "vboArray");
+    MonoClassField *field_vbo_element    = mono_class_get_field_from_name(klass, "vboElement");
     MonoClassField *field_vertices_count = mono_class_get_field_from_name(klass, "verticesCount");
-    MonoClassField *field_indices_count = mono_class_get_field_from_name(klass, "indicesCount");
-    MonoClassField *field_is_line = mono_class_get_field_from_name(klass, "isLine");
+    MonoClassField *field_indices_count  = mono_class_get_field_from_name(klass, "indicesCount");
+    MonoClassField *field_is_line        = mono_class_get_field_from_name(klass, "isLine");
 
     mono_field_set_value(recipient, field_vao, &mesh_data->vao);
     mono_field_set_value(recipient, field_vbo_array, &mesh_data->vbo_array);
@@ -532,9 +542,9 @@ namespace visualkey {
     PlayAudio(u8_path, loop);
   }
 
-  ImageData*
+  ImageData *
   ToImageData(MonoObject *obj) {
-    ImageData *data = new ImageData();
+    ImageData *data  = new ImageData();
     MonoClass *klass = mono_object_get_class(obj);
 
     MonoClassField *field_id = mono_class_get_field_from_name(klass, "id");
@@ -555,7 +565,7 @@ namespace visualkey {
 
     ImageData *image = CreateImage(path + u8_path);
 
-    MonoClass *klass = mono_object_get_class(recipient);
+    MonoClass *klass         = mono_object_get_class(recipient);
     MonoClassField *field_id = mono_class_get_field_from_name(klass, "id");
     mono_field_set_value(recipient, field_id, &image->texture);
 
@@ -583,13 +593,13 @@ namespace visualkey {
   DrawColorMono(MonoObject *obj) {
     ShaderData *shader = GetCurrentShader();
     i32 is_texture_loc = GetLocation(shader, "IsTexture");
-    i32 color_loc = GetLocation(shader, "Color", false);
+    i32 color_loc      = GetLocation(shader, "Color", false);
     SetInt(shader, is_texture_loc, 0);
     v3 color = ToVec3(obj);
     SetVec3(shader, color_loc, color);
   }
 
-  ShaderData*
+  ShaderData *
   ToShaderData(MonoObject *obj) {
     ShaderData *data = new ShaderData();
     MonoClass *klass = mono_object_get_class(obj);
@@ -612,7 +622,7 @@ namespace visualkey {
 
     ShaderData *shader = CreateShader(path + u8_path);
 
-    MonoClass *klass = mono_object_get_class(recipient);
+    MonoClass *klass         = mono_object_get_class(recipient);
     MonoClassField *field_id = mono_class_get_field_from_name(klass, "program");
     mono_field_set_value(recipient, field_id, &shader->program);
 
@@ -636,8 +646,8 @@ namespace visualkey {
   i32
   ShaderGetLocation(MonoObject *obj, MonoString *name) {
     std::string u8_name = mono_string_to_utf8(name);
-    ShaderData *shader = ToShaderData(obj);
-    i32 loc = GetLocation(shader, u8_name);
+    ShaderData *shader  = ToShaderData(obj);
+    i32 loc             = GetLocation(shader, u8_name);
     delete shader;
     return loc;
   }
@@ -652,7 +662,7 @@ namespace visualkey {
   void
   ShaderSetVec2(MonoObject *obj, i32 location, MonoObject *val) {
     ShaderData *shader = ToShaderData(obj);
-    v2 vec = ToVec2(val);
+    v2 vec             = ToVec2(val);
     SetVec2(shader, location, vec);
     delete shader;
   }
@@ -660,7 +670,7 @@ namespace visualkey {
   void
   ShaderSetVec3(MonoObject *obj, i32 location, MonoObject *val) {
     ShaderData *shader = ToShaderData(obj);
-    v3 vec = ToVec3(val);
+    v3 vec             = ToVec3(val);
     SetVec3(shader, location, vec);
     delete shader;
   }
@@ -668,7 +678,7 @@ namespace visualkey {
   void
   ShaderSetVec4(MonoObject *obj, i32 location, MonoObject *val) {
     ShaderData *shader = ToShaderData(obj);
-    v4 vec = ToVec4(val);
+    v4 vec             = ToVec4(val);
     SetVec4(shader, location, vec);
     delete shader;
   }
@@ -676,7 +686,7 @@ namespace visualkey {
   void
   ShaderSetMat3(MonoObject *obj, i32 location, MonoObject *val) {
     ShaderData *shader = ToShaderData(obj);
-    mat3 mat = ToMat3(val);
+    mat3 mat           = ToMat3(val);
     SetMat3(shader, location, mat);
     delete shader;
   }
@@ -684,7 +694,7 @@ namespace visualkey {
   void
   ShaderSetMat4(MonoObject *obj, i32 location, MonoObject *val) {
     ShaderData *shader = ToShaderData(obj);
-    mat4 mat = ToMat4(val);
+    mat4 mat           = ToMat4(val);
     SetMat4(shader, location, mat);
     delete shader;
   }
@@ -695,12 +705,12 @@ namespace visualkey {
     TranslateMesh(pos);
   }
 
-  MonoObject*
+  MonoObject *
   GetMousePosMono() {
     v2d pos = GetMousePos();
     v2 fpos;
-    fpos.x = (f32)pos.x;
-    fpos.y = (f32)pos.y;
+    fpos.x          = (f32)pos.x;
+    fpos.y          = (f32)pos.y;
     MonoObject *vec = FromVec2(fpos);
     return vec;
   }
@@ -713,9 +723,9 @@ namespace visualkey {
 
   void
   NewStash(MonoObject *recipient) {
-    v3 position = GetPosition();
-    quat rotation = GetRotation();
-    MonoClass *klass = mono_object_get_class(recipient);
+    v3 position                    = GetPosition();
+    quat rotation                  = GetRotation();
+    MonoClass *klass               = mono_object_get_class(recipient);
     MonoClassField *field_position = mono_class_get_field_from_name(klass, "position");
     MonoClassField *field_rotation = mono_class_get_field_from_name(klass, "rotation");
     mono_field_set_value(recipient, field_position, FromVec3(position));
@@ -724,23 +734,19 @@ namespace visualkey {
 
   void
   PopStash(MonoObject *stash) {
-    MonoClass *klass = mono_object_get_class(stash);
+    MonoClass *klass               = mono_object_get_class(stash);
     MonoClassField *field_position = mono_class_get_field_from_name(klass, "position");
     MonoClassField *field_rotation = mono_class_get_field_from_name(klass, "rotation");
 
-    if (!field_position || !field_rotation) {
-      std::cerr << "obj is not a Stash\n";
-    }
+    if (!field_position || !field_rotation) { std::cerr << "obj is not a Stash\n"; }
 
     MonoObject *obj_position;
     MonoObject *obj_rotation;
     mono_field_get_value(stash, field_position, &obj_position);
     mono_field_get_value(stash, field_rotation, &obj_rotation);
-    if (!obj_position)
-      std::cout << "obj_position is null\n";
-    if (!obj_rotation)
-      std::cout << "obj_rotation is null\n";
-    v3 position = ToVec3(obj_position);
+    if (!obj_position) std::cout << "obj_position is null\n";
+    if (!obj_rotation) std::cout << "obj_rotation is null\n";
+    v3 position   = ToVec3(obj_position);
     quat rotation = ToQuat(obj_rotation);
 
     TranslateMesh(position);
@@ -754,7 +760,8 @@ namespace visualkey {
     mono_add_internal_call("VisualKey.Window::BackgroundWindow", (const void *)ClearBackground);
     mono_add_internal_call("VisualKey.Window::SizeWindow", (const void *)WindowSize);
     mono_add_internal_call("VisualKey.Window::FullscreenWindow", (const void *)WindowFullscreen);
-    mono_add_internal_call("VisualKey.Window::MakeCurrentWindow", (const void *)MakeCurrentWindowMono);
+    mono_add_internal_call("VisualKey.Window::MakeCurrentWindow",
+                           (const void *)MakeCurrentWindowMono);
     mono_add_internal_call("VisualKey.Window::SetOrtho", (const void *)SetOrtho);
     mono_add_internal_call("VisualKey.Window::GetOrtho", (const void *)IsOrtho);
 
@@ -762,7 +769,8 @@ namespace visualkey {
     mono_add_internal_call("VisualKey.Time::GetTime", (const void *)glfwGetTime);
 
     mono_add_internal_call("VisualKey.Mesh::CreateMesh", (const void *)CreateMeshMono);
-    mono_add_internal_call("VisualKey.Mesh::CreateMeshIndices", (const void *)CreateMeshIndicesMono);
+    mono_add_internal_call("VisualKey.Mesh::CreateMeshIndices",
+                           (const void *)CreateMeshIndicesMono);
     mono_add_internal_call("VisualKey.Mesh::DestroyMesh", (const void *)DestroyMeshMono);
     mono_add_internal_call("VisualKey.Mesh::DrawMesh", (const void *)DrawMeshMono);
     mono_add_internal_call("VisualKey.Mesh::PolygonMode", (const void *)PolygonMode);
@@ -782,7 +790,8 @@ namespace visualkey {
     mono_add_internal_call("VisualKey.Input::IsMouseJustPressed", (const void *)IsMouseJustPressed);
     mono_add_internal_call("VisualKey.Input::IsPadJustPressed", (const void *)IsPadJustPressed);
     mono_add_internal_call("VisualKey.Input::IsKeyJustReleased", (const void *)IsKeyJustReleased);
-    mono_add_internal_call("VisualKey.Input::IsMouseJustReleased", (const void *)IsMouseJustReleased);
+    mono_add_internal_call("VisualKey.Input::IsMouseJustReleased",
+                           (const void *)IsMouseJustReleased);
     mono_add_internal_call("VisualKey.Input::IsPadJustReleased", (const void *)IsPadJustReleased);
     mono_add_internal_call("VisualKey.Input::GetJoyStick", (const void *)GetJoyStick);
     mono_add_internal_call("VisualKey.Input::GetMousePos", (const void *)GetMousePosMono);

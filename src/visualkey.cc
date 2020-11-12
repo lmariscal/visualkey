@@ -1,6 +1,6 @@
 #include <iostream>
 #include <GLFW/glfw3.h>
-#include "typedefs.h"
+#include "types.h"
 #include "window.h"
 #include "mono_script.h"
 #include "shader.h"
@@ -12,7 +12,7 @@ using namespace visualkey;
 
 i32
 main(i32 argc, char const **argv) {
- if (argc == 1) {
+  if (argc == 1) {
     std::cout << "\
 Usage:\n\
   visualkey [DIRECTORY]\n\
@@ -28,7 +28,8 @@ Usage:\n\
   MonoCompile(dir);
   MonoStart();
 
-  ShaderSource *uber_source = ReadShader("\
+  ShaderSource *uber_source = ReadShader(
+    "\
 #version 330 core\n\
 \
 layout (location = 0) in vec3 vPos;\
@@ -43,7 +44,8 @@ void main() {\
   gl_Position = Perspective * Model * vec4(vPos, 1.0);\
   TexCoord = vTexCoord;\
 }\
-  ", "\
+  ",
+    "\
 #version 330 core\n\
 \
 in vec2 TexCoord;\
@@ -64,8 +66,8 @@ void main() {\
   SetUberShader(uber);
 
   i32 perspective_loc = GetLocation(uber, "Perspective");
-  i32 color_loc = GetLocation(uber, "Color");
-  i32 model_loc = GetLocation(uber, "Model");
+  i32 color_loc       = GetLocation(uber, "Color");
+  i32 model_loc       = GetLocation(uber, "Model");
 
   while (WindowIsOpen(GetFocusedWindow())) {
     NewFrame();
@@ -74,7 +76,9 @@ void main() {\
 
     v2i size(0);
     glfwGetWindowSize(glfwGetCurrentContext(), &size.x, &size.y);
-    m4 perspective = IsOrtho() ? ortho(-(size.x / 2.0f), size.x / 2.0f, -(size.y / 2.0f), size.y / 2.0f) : glm::perspective(radians(106.0f), (f32)size.x / (f32)size.y, 0.1f, 10000.0f);
+    m4 perspective = IsOrtho()
+      ? ortho(-(size.x / 2.0f), size.x / 2.0f, -(size.y / 2.0f), size.y / 2.0f)
+      : glm::perspective(radians(106.0f), (f32)size.x / (f32)size.y, 0.1f, 10000.0f);
     v3 default_color(250.0f / 255.0f, 250.0f / 255.0f, 250.0f / 255.0f);
     m4 model = m4(1.0f);
 

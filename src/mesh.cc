@@ -52,12 +52,12 @@ namespace visualkey {
     rotation = rotate(rotation, { 0.0f, 0.0f, value });
   }
 
-  MeshData*
+  MeshData *
   CreateMesh(const std::vector<f32> &vertices, const std::vector<u32> &indices, bool is_line) {
-    MeshData *data = new MeshData();
-    data->indices_count = indices.size();
+    MeshData *data       = new MeshData();
+    data->indices_count  = indices.size();
     data->vertices_count = vertices.size();
-    data->is_line = is_line;
+    data->is_line        = is_line;
 
     glGenBuffers(1, &data->vbo_array);
     glGenBuffers(1, &data->vbo_element);
@@ -68,7 +68,10 @@ namespace visualkey {
     glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, data->vbo_element);
 
     glBufferData(GL_ARRAY_BUFFER, sizeof(f32) * data->vertices_count, &vertices[0], GL_STATIC_DRAW);
-    glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(u32) * data->indices_count, &indices[0], GL_STATIC_DRAW);
+    glBufferData(GL_ELEMENT_ARRAY_BUFFER,
+                 sizeof(u32) * data->indices_count,
+                 &indices[0],
+                 GL_STATIC_DRAW);
 
     glEnableVertexAttribArray(0);
     glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, sizeof(f32) * 5, (void *)0);
@@ -85,7 +88,7 @@ namespace visualkey {
     return data;
   }
 
-  MeshData*
+  MeshData *
   CreateMesh(const std::vector<f32> &vertices, bool is_line) {
     std::vector<u32> indices;
     for (int i = 0; i < vertices.size() / 5; ++i)
@@ -95,8 +98,7 @@ namespace visualkey {
 
   void
   DestroyMesh(MeshData *data) {
-    if (!glfwGetCurrentContext())
-      return;
+    if (!glfwGetCurrentContext()) return;
     glDeleteBuffers(1, &data->vbo_array);
     glDeleteBuffers(1, &data->vbo_element);
     glDeleteVertexArrays(1, &data->vao);
@@ -109,14 +111,13 @@ namespace visualkey {
     ShaderData *shader = GetCurrentShader();
     if (shader->program == GetUberShader()) {
       i32 model_loc = GetLocation(shader, "Model", false);
-      m4 model = mat4(1.0f);
-      model = translate(model, position);
-      model = model * toMat4(rotation);
+      m4 model      = mat4(1.0f);
+      model         = translate(model, position);
+      model         = model * toMat4(rotation);
       SetMat4(shader, model_loc, model);
     }
 
-    if (data->is_line)
-      glDrawElements(GL_LINES, data->indices_count, GL_UNSIGNED_INT, (void *)0);
+    if (data->is_line) glDrawElements(GL_LINES, data->indices_count, GL_UNSIGNED_INT, (void *)0);
     else
       glDrawElements(GL_TRIANGLES, data->indices_count, GL_UNSIGNED_INT, (void *)0);
 

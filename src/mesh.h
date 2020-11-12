@@ -1,6 +1,6 @@
 #pragma once
 
-#include "typedefs.h"
+#include "types.h"
 #include <vector>
 
 namespace visualkey {
@@ -14,8 +14,10 @@ namespace visualkey {
     bool is_line;
   };
 
-  MeshData* CreateMesh(const std::vector<f32> &vertices, const std::vector<u32> &indices, bool is_line = false);
-  MeshData* CreateMesh(const std::vector<f32> &vertices, bool is_line = false);
+  MeshData *CreateMesh(const std::vector<f32> &vertices,
+                       const std::vector<u32> &indices,
+                       bool is_line = false);
+  MeshData *CreateMesh(const std::vector<f32> &vertices, bool is_line = false);
   quat GetRotation();
   v3 GetPosition();
   void SetRotation(quat value);
