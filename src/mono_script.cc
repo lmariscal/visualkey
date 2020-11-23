@@ -395,6 +395,24 @@ namespace visualkey {
     delete window_data;
   }
 
+  // mono_add_internal_call("VisualKey.Window::ResizeWindow", (const void *)ResizeWindowMono);
+  // mono_add_internal_call("VisualKey.Window::GetSizeWindow", (const void *)GetSizeWindowMono);
+  MonoObject *
+  GetSizeWindowMono(MonoObject *window) {
+    WindowData *data   = ToWindowData(window);
+    v2 size            = GetWindowSize(data);
+    MonoObject *result = FromVec2(size);
+    delete data;
+    return result;
+  }
+
+  void
+  ResizeWindowMono(u32 width, u32 height, MonoObject *window) {
+    WindowData *data = ToWindowData(window);
+    WindowSize(data, width, height);
+    delete data;
+  }
+
   void
   MakeCurrentWindowMono(MonoObject *window) {
     WindowData *data = ToWindowData(window);
@@ -758,7 +776,8 @@ namespace visualkey {
     mono_add_internal_call("VisualKey.Window::CreateWindow", (const void *)CreateWindowMono);
     mono_add_internal_call("VisualKey.Window::DestroyWindow", (const void *)DestroyWindowMono);
     mono_add_internal_call("VisualKey.Window::BackgroundWindow", (const void *)ClearBackground);
-    mono_add_internal_call("VisualKey.Window::SizeWindow", (const void *)WindowSize);
+    mono_add_internal_call("VisualKey.Window::ResizeWindow", (const void *)ResizeWindowMono);
+    mono_add_internal_call("VisualKey.Window::GetSizeWindow", (const void *)GetSizeWindowMono);
     mono_add_internal_call("VisualKey.Window::FullscreenWindow", (const void *)WindowFullscreen);
     mono_add_internal_call("VisualKey.Window::MakeCurrentWindow",
                            (const void *)MakeCurrentWindowMono);

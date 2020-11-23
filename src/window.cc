@@ -309,9 +309,8 @@ namespace visualkey {
   }
 
   void
-  WindowSize(u32 width, u32 height) {
-    GLFWwindow *window = glfwGetCurrentContext();
-    glfwSetWindowSize(window, width, height);
+  WindowSize(WindowData *data, u32 width, u32 height) {
+    glfwSetWindowSize(data->window, width, height);
   }
 
   v2i

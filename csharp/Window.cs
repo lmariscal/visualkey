@@ -8,10 +8,21 @@ namespace VisualKey {
     private IntPtr window;
 #pragma warning restore 0169
 
+    public Vec2 size {
+      get {
+        return GetSizeWindow(this);
+      }
+      set {
+        ResizeWindow((uint)value.x, (uint)value.y, this);
+      }
+    }
+
     [MethodImplAttribute(MethodImplOptions.InternalCall)]
     private extern static void BackgroundWindow(uint r, uint g, uint b);
     [MethodImplAttribute(MethodImplOptions.InternalCall)]
-    private extern static void SizeWindow(uint width, uint height);
+    private extern static void ResizeWindow(uint width, uint height, Window window);
+    [MethodImplAttribute(MethodImplOptions.InternalCall)]
+    private extern static Vec2 GetSizeWindow(Window window);
     [MethodImplAttribute(MethodImplOptions.InternalCall)]
     private extern static bool FullscreenWindow();
     [MethodImplAttribute(MethodImplOptions.InternalCall)]

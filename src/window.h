@@ -25,7 +25,7 @@ namespace visualkey {
   void TerminateGFX();
   void ClearBackground(u32 r, u32 g, u32 b);
   void CloseWindow();
-  void WindowSize(u32 width, u32 height);
+  void WindowSize(WindowData *data, u32 width, u32 height);
   void SetOrtho(bool mode);
   bool WindowFullscreen();
   bool WindowIsOpen(GLFWwindow *window);
