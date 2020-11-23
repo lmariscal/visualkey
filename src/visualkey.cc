@@ -51,14 +51,14 @@ void main() {\
 in vec2 TexCoord;\
 \
 uniform bool IsTexture;\
-uniform vec3 Color;\
+uniform vec4 Color;\
 uniform sampler2D Texture;\
 \
 void main() {\
   if (IsTexture)\
     gl_FragColor = texture(Texture, TexCoord);\
   else\
-    gl_FragColor = vec4(Color, 1.0f);\
+    gl_FragColor = vec4(Color);\
 }\
   ");
   ShaderData *uber = CreateShader(uber_source);
@@ -79,13 +79,13 @@ void main() {\
     m4 perspective = IsOrtho()
       ? ortho(-(size.x / 2.0f), size.x / 2.0f, -(size.y / 2.0f), size.y / 2.0f)
       : glm::perspective(radians(106.0f), (f32)size.x / (f32)size.y, 0.1f, 10000.0f);
-    v3 default_color(250.0f / 255.0f, 250.0f / 255.0f, 250.0f / 255.0f);
+    v4 default_color(250.0f / 255.0f, 250.0f / 255.0f, 250.0f / 255.0f, 1.0f);
     m4 model = m4(1.0f);
 
     DrawShader(uber);
     SetMat4(uber, perspective_loc, perspective);
     SetMat4(uber, model_loc, model);
-    SetVec3(uber, color_loc, default_color);
+    SetVec4(uber, color_loc, default_color);
 
     MonoUpdate();
     SwapAllBuffers();

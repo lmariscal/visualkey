@@ -164,6 +164,8 @@ namespace visualkey {
     glfwSetWindowFocusCallback(data->window, FocusEvent);
 
     glEnable(GL_DEPTH_TEST);
+    glEnable(GL_BLEND);
+    glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 
     FocusEvent(data->window, 1);
 
@@ -238,6 +240,8 @@ namespace visualkey {
     }
 
     glEnable(GL_DEPTH_TEST);
+    glEnable(GL_BLEND);
+    glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
   }
 
   GLFWwindow *

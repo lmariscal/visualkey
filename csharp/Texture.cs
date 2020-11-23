@@ -29,21 +29,30 @@ namespace VisualKey {
   }
 
   public class Color {
-    public Vec3 color { get; private set; }
+    public Vec4 color { get; private set; }
 
     [MethodImplAttribute(MethodImplOptions.InternalCall)]
-    private extern static void DrawColor(Vec3 color);
+    private extern static void DrawColor(Vec4 color);
 
-    public Color(Vec3 color) {
-      this.color = color / 255.0f;
+    public Color(Vec4 color) {
+      this.color = Normalize(color);
     }
 
-    public void SetColor(Vec3 color) {
-      this.color = color / 255.0f;
+    public void SetColor(Vec4 color) {
+      this.color = Normalize(color);
     }
 
     public void Draw() {
       DrawColor(color);
+    }
+
+    private Vec4 Normalize(Vec4 color) {
+      Vec4 res = new Vec4(0);
+      res.x = color.x / 255.0f;
+      res.y = color.y / 255.0f;
+      res.z = color.z / 255.0f;
+      res.w = color.w > 1.0f ? color.w / 100.0f : color.w;
+      return res;
     }
   }
 

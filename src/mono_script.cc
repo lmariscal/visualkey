@@ -595,8 +595,8 @@ namespace visualkey {
     i32 is_texture_loc = GetLocation(shader, "IsTexture");
     i32 color_loc      = GetLocation(shader, "Color", false);
     SetInt(shader, is_texture_loc, 0);
-    v3 color = ToVec3(obj);
-    SetVec3(shader, color_loc, color);
+    v4 color = ToVec4(obj);
+    SetVec4(shader, color_loc, color);
   }
 
   ShaderData *
