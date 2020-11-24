@@ -248,4 +248,26 @@ namespace VisualKey {
     }
   }
 
+  public class Sphere {
+    public Mesh mesh { get; private set; }
+
+    public Sphere(float width, float height) {
+      float[] vertices = {
+         (width / 2.0f),  (height / 2.0f), 0.0f,  1.0f, 1.0f,
+         (width / 2.0f), -(height / 2.0f), 0.0f,  1.0f, 0.0f,
+        -(width / 2.0f), -(height / 2.0f), 0.0f,  0.0f, 0.0f,
+        -(width / 2.0f),  (height / 2.0f), 0.0f,  0.0f, 1.0f
+      };
+      uint[] indices = {
+        0, 1, 3,
+        1, 2, 3
+      };
+      mesh = new Mesh(vertices, indices);
+    }
+
+    public void Draw() {
+      mesh.Draw();
+    }
+  }
+
 }

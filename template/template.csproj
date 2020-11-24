@@ -1,0 +1,13 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <AssemblyName>App</AssemblyName>
+    <OutputPath>.vsk\</OutputPath>
+    <TargetFramework>net50</TargetFramework>
+    <BaseIntermediateOutputPath>.vsk\obj\</BaseIntermediateOutputPath>
+  </PropertyGroup>
+  <ItemGroup>
+    <Reference Include="VisualKey">
+      <HintPath>$$VISUALKEY_DLL_PATH$$</HintPath>
+    </Reference>
+  </ItemGroup>
+</Project>

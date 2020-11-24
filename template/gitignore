@@ -1,0 +1,7 @@
+*.dll
+*.mdb
+*.csproj
+
+obj/
+.vsk/
+.vscode/

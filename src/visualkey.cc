@@ -1,4 +1,5 @@
 #include <iostream>
+#include <filesystem>
 #include <GLFW/glfw3.h>
 #include "types.h"
 #include "window.h"
@@ -10,18 +11,31 @@
 
 using namespace visualkey;
 
-i32
-main(i32 argc, char const **argv) {
-  if (argc == 1) {
-    std::cout << "\
-Usage:\n\
-  visualkey [DIRECTORY]\n\
-";
-    return 0;
+void
+InitProject(const std::string &dir) {
+  if (!std::filesystem::is_empty(dir)) {
+    bool is_okay = false;
+    std::cout << "Directory is not empty.\n";
+    while (!is_okay) {
+      std::cout << "Continue? [y/n]: ";
+      std::string answer;
+      std::getline(std::cin, answer);
+      if (answer == "y") {
+        std::cout << "Continuing...\n";
+        is_okay = true;
+      } else if (answer == "n") {
+        std::cout << "Aborting...\n";
+        return;
+      } else {
+        std::cout << "Please enter either 'y' or 'n'\n";
+      }
+    }
   }
+  InitProjectMono(dir);
+}
 
-  std::string dir = argv[1];
-
+void
+RunProject(const std::string &dir) {
   InitGFX();
   InitAudio(dir);
   InitMono();
@@ -98,5 +112,41 @@ void main() {\
   TerminateMono();
   TerminateGFX();
   delete uber;
-  return 0;
+}
+
+void
+ParseArgs(i32 argc, char const **argv) {
+  const std::string help =
+    "\
+VisualKey v0.1\n\
+\n\
+Usage:\n\
+\tvisualkey [command] <directory>\n\
+\n\
+Command:\n\
+\trun\tRun the directory inside visualkey\n\
+\tinit\tInitialize project for VSCode\n\
+";
+
+  if (argc == 1) {
+    std::cout << help;
+    return;
+  }
+
+  std::string command = argv[1];
+  std::string dir     = argc == 2 ? "." : argv[2];
+
+  if (command == "init") {
+    InitProject(dir);
+  } else if (command == "run") {
+    RunProject(dir);
+  } else {
+    std::cout << "Unkown command '" << command << "'\n\n";
+    std::cout << help;
+  }
+}
+
+i32
+main(i32 argc, char const **argv) {
+  ParseArgs(argc, argv);
 }

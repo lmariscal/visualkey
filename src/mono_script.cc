@@ -3,6 +3,8 @@
 #include <iostream>
 #include <mono/metadata/assembly.h>
 #include <mono/metadata/debug-helpers.h>
+#include <filesystem>
+#include <fstream>
 
 #include "window.h"
 #include "iomanager.h"
@@ -44,18 +46,66 @@ namespace visualkey {
   }
 
   void
-  MonoCompile(std::string dir) {
+  InitProjectMono(const std::string &dir) {
     path = dir;
     if (dir.at(dir.size() - 1) != '/' && dir.at(dir.size() - 1) != '\\') path += "/";
+    std::string template_path = ExePath() + "/../template/";
+
+    std::string name;
+
+    if (dir == ".") name = std::filesystem::current_path().filename();
+    else
+      name = std::filesystem::path(dir).filename();
+
+    auto deleteIfExists = [](const std::string path) {
+      if (std::filesystem::exists(path)) std::filesystem::remove(path);
+    };
+
+    deleteIfExists(path + "App.cs");
+    deleteIfExists(path + name + ".csproj");
+    deleteIfExists(path + ".gitignore");
+    deleteIfExists(path + ".vscode/tasks.json");
+    deleteIfExists(path + ".vscode");
+
+    std::filesystem::copy(template_path + "App.cs", path + "App.cs");
+    std::filesystem::copy(template_path + "gitignore", path + ".gitignore");
+    std::filesystem::copy(template_path + ".vscode", path + ".vscode");
+
+    std::ifstream csproj(template_path + "template.csproj");
+    std::string csproj_contents((std::istreambuf_iterator<char>(csproj)),
+                                std::istreambuf_iterator<char>());
+    csproj.close();
+
+    auto replace = [](std::string &str, const std::string &from, const std::string &to) {
+      size_t start_pos = str.find(from);
+      if (start_pos == std::string::npos) return false;
+      str.replace(start_pos, from.length(), to);
+      return true;
+    };
+
+    std::string dll_path =
+      std::filesystem::path(ExePath()).parent_path().string() + "/api/Release/VisualKey.dll";
+    replace(csproj_contents, "$$VISUALKEY_DLL_PATH$$", dll_path);
+
+    std::ofstream new_csproj(path + name + ".csproj");
+    new_csproj << csproj_contents;
+    new_csproj.close();
+  }
+
+  void
+  MonoCompile(const std::string &dir) {
+    path = dir;
+    if (dir.at(dir.size() - 1) != '/' && dir.at(dir.size() - 1) != '\\') path += "/";
+    if (!std::filesystem::exists(path + ".vsk")) std::filesystem::create_directory(path + ".vsk");
 
 #if defined(WIN32) || defined(_WIN32)
 #if defined(VISUALKEY_DEBUG)
     std::string command = ExePath() + "/../mono/mcs " + path + "*.cs /out:" + path +
-      "App.dll /target:library /debug /optimize /w:4 /nologo /reference:" + ExePath() +
+      ".vsk/App.dll /target:library /debug /optimize /w:4 /nologo /reference:" + ExePath() +
       "/../api/Debug/VisualKey.dll";
 #else
     std::string command = ExePath() + "/../mono/mcs " + path + "*.cs /out:" + path +
-      "App.dll /target:library /debug /optimize /w:4 /nologo /reference:" + ExePath() +
+      ".vsk/App.dll /target:library /debug /optimize /w:4 /nologo /reference:" + ExePath() +
       "/../api/Release/VisualKey.dll";
 #endif
     i32 ret = system(command.c_str());
@@ -67,11 +117,11 @@ namespace visualkey {
 #elif defined(__linux__)
 #if defined(VISUALKEY_DEBUG)
     std::string command = "mcs " + path + "*.cs /out:" + path +
-      "App.dll /target:library /debug /optimize /w:4 /nologo /reference:" + ExePath() +
+      ".vsk/App.dll /target:library /debug /optimize /w:4 /nologo /reference:" + ExePath() +
       "/../api/Debug/VisualKey.dll";
 #else
     std::string command = "mcs " + path + "*.cs /out:" + path +
-      "App.dll /target:library /debug /optimize /w:4 /nologo /reference:" + ExePath() +
+      ".vsk/App.dll /target:library /debug /optimize /w:4 /nologo /reference:" + ExePath() +
       "/../api/Release/VisualKey.dll";
 #endif
     i32 ret = system(command.c_str());
@@ -85,7 +135,7 @@ namespace visualkey {
 #endif
 
     std::string name = path;
-    name += "App.dll";
+    name += ".vsk/App.dll";
 
     mono_set_dirs(std::string(ExePath() + "/../lib").c_str(),
                   std::string(ExePath() + "/../etc").c_str());

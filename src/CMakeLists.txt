@@ -286,3 +286,6 @@ foreach(lib_i ${MONO_LIB_FILES})
   endif()
 endforeach()
 
+# Template Copy
+
+file(COPY ${CMAKE_SOURCE_DIR}/template DESTINATION ${CMAKE_BINARY_DIR}/dist)

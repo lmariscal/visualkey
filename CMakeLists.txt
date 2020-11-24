@@ -11,6 +11,8 @@ option(MONO_ETC "Installed Mono etc dir path" "")
 
 if(UNIX AND NOT APPLE)
   set(LINUX TRUE)
+  set(CMAKE_C_FLAGS "-fuse-ld=lld -Wno-unused-command-line-argument")
+  set(CMAKE_CXX_FLAGS "-fuse-ld=lld -Wno-unused-command-line-argument")
 endif()
 
 if(NOT CMAKE_BUILD_TYPE)
