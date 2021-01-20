@@ -61,20 +61,19 @@ namespace visualkey {
       if (std::filesystem::exists(path)) std::filesystem::remove(path);
     };
 
-    deleteIfExists(path + "App.cs");
+    // deleteIfExists(path + "App.cs");
     deleteIfExists(path + name + ".csproj");
     deleteIfExists(path + ".gitignore");
     deleteIfExists(path + ".vscode/tasks.json");
-    deleteIfExists(path + ".vscode");
+    deleteIfExists(path + ".run/VisualKey.run.xml");
 
-    std::filesystem::copy(template_path + "App.cs", path + "App.cs");
+    if (!std::filesystem::exists(path + "App.cs"))
+      std::filesystem::copy(template_path + "App.cs", path + "App.cs");
     std::filesystem::copy(template_path + "gitignore", path + ".gitignore");
-    std::filesystem::copy(template_path + ".vscode", path + ".vscode");
-
-    std::ifstream csproj(template_path + "template.csproj");
-    std::string csproj_contents((std::istreambuf_iterator<char>(csproj)),
-                                std::istreambuf_iterator<char>());
-    csproj.close();
+    if (!std::filesystem::exists(path + ".vscode"))
+      std::filesystem::create_directory(path + ".vscode");
+    std::filesystem::copy(template_path + ".vscode/tasks.json", path + ".vscode/tasks.json");
+    if (!std::filesystem::exists(path + ".run")) std::filesystem::create_directory(path + ".run");
 
     auto replace = [](std::string &str, const std::string &from, const std::string &to) {
       size_t start_pos = str.find(from);
@@ -82,14 +81,34 @@ namespace visualkey {
       str.replace(start_pos, from.length(), to);
       return true;
     };
+    std::string dist_path = std::filesystem::path(ExePath()).parent_path().string();
 
-    std::string dll_path =
-      std::filesystem::path(ExePath()).parent_path().string() + "/api/Release/VisualKey.dll";
-    replace(csproj_contents, "$$VISUALKEY_DLL_PATH$$", dll_path);
+    // csproj
+
+    std::ifstream csproj(template_path + "template.csproj");
+    std::string csproj_contents((std::istreambuf_iterator<char>(csproj)),
+                                std::istreambuf_iterator<char>());
+    csproj.close();
+
+    while (replace(csproj_contents, "$$VISUALKEY_DIST_PATH$$", dist_path)) {}
 
     std::ofstream new_csproj(path + name + ".csproj");
     new_csproj << csproj_contents;
     new_csproj.close();
+
+    // run xml
+
+    std::ifstream run_xml(template_path + ".run/VisualKey.run.xml");
+    std::string run_xml_contents((std::istreambuf_iterator<char>(run_xml)),
+                                 std::istreambuf_iterator<char>());
+
+    run_xml.close();
+
+    while (replace(run_xml_contents, "$$VISUALKEY_DIST_PATH$$", dist_path)) {}
+
+    std::ofstream new_run_xml(path + ".run/VisualKey.run.xml");
+    new_run_xml << run_xml_contents;
+    new_run_xml.close();
   }
 
   void
