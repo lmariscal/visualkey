@@ -13,6 +13,13 @@ using namespace visualkey;
 
 void
 InitProject(const std::string &dir) {
+  if (!std::filesystem::exists(dir)) {
+    if (!std::filesystem::exists(std::filesystem::path(dir).parent_path().string())) {
+      std::cerr << "Error: Not able to create nested directories for init.\n";
+      return;
+    }
+    std::filesystem::create_directory(dir);
+  }
   if (!std::filesystem::is_empty(dir)) {
     bool is_okay = false;
     std::cout << "Directory is not empty.\n";
@@ -36,6 +43,11 @@ InitProject(const std::string &dir) {
 
 void
 RunProject(const std::string &dir) {
+  if (!std::filesystem::exists(dir)) {
+    std::cerr << "Error: Directory '" << dir << "' does not exist." << '\n';
+    return;
+  }
+
   InitGFX();
   InitAudio(dir);
   InitMono();
