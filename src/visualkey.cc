@@ -24,7 +24,7 @@ InitProject(const std::string &dir) {
     bool is_okay = false;
     std::cout << "Directory is not empty.\n";
     while (!is_okay) {
-      std::cout << "Continue? [y/n]: ";
+      std::cout << "Continue? No scripts will be modified. [y/n]: ";
       std::string answer;
       std::getline(std::cin, answer);
       if (answer == "y") {
@@ -147,6 +147,13 @@ Command:\n\
 
   std::string command = argv[1];
   std::string dir     = argc == 2 ? "." : argv[2];
+
+#if defined(__linux__)
+  if (dir[0] != '/' && dir[0] != '.') dir = "./" + dir;
+  if (dir[dir.length() - 1] == '/') dir.pop_back();
+#endif
+
+  std::cout << "dir: " << dir << '\n';
 
   if (command == "init") {
     InitProject(dir);

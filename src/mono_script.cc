@@ -464,8 +464,6 @@ namespace visualkey {
     delete window_data;
   }
 
-  // mono_add_internal_call("VisualKey.Window::ResizeWindow", (const void *)ResizeWindowMono);
-  // mono_add_internal_call("VisualKey.Window::GetSizeWindow", (const void *)GetSizeWindowMono);
   MonoObject *
   GetSizeWindowMono(MonoObject *window) {
     WindowData *data   = ToWindowData(window);
@@ -486,6 +484,14 @@ namespace visualkey {
   MakeCurrentWindowMono(MonoObject *window) {
     WindowData *data = ToWindowData(window);
     MakeCurrent(data);
+    delete data;
+  }
+
+  void
+  CloseWindowMono(MonoObject *window) {
+    WindowData *data = ToWindowData(window);
+    MakeCurrent(data);
+    CloseWindow();
     delete data;
   }
 
@@ -850,6 +856,7 @@ namespace visualkey {
     mono_add_internal_call("VisualKey.Window::FullscreenWindow", (const void *)WindowFullscreen);
     mono_add_internal_call("VisualKey.Window::MakeCurrentWindow",
                            (const void *)MakeCurrentWindowMono);
+    mono_add_internal_call("VisualKey.Window::CloseWindow", (const void *)CloseWindowMono);
     mono_add_internal_call("VisualKey.Window::SetOrtho", (const void *)SetOrtho);
     mono_add_internal_call("VisualKey.Window::GetOrtho", (const void *)IsOrtho);
 

@@ -28,6 +28,8 @@ namespace VisualKey {
     [MethodImplAttribute(MethodImplOptions.InternalCall)]
     private extern static void MakeCurrentWindow(Window window);
     [MethodImplAttribute(MethodImplOptions.InternalCall)]
+    private extern static void CloseWindow(Window window);
+    [MethodImplAttribute(MethodImplOptions.InternalCall)]
     private extern static void CreateWindow(uint width, uint height, string title, Window recipient);
     [MethodImplAttribute(MethodImplOptions.InternalCall)]
     private extern static void DestroyWindow(Window window);
@@ -81,6 +83,10 @@ namespace VisualKey {
 
     public void MakeCurrent() {
       MakeCurrentWindow(this);
+    }
+
+    public void Close() {
+      CloseWindow(this);
     }
   }
 
