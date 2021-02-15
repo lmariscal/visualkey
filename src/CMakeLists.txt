@@ -92,6 +92,8 @@ endforeach()
 set_target_properties(visualkey PROPERTIES RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/dist/bin)
 set_target_properties(visualkey PROPERTIES OUTPUT_NAME visualkey)
 
+target_compile_definitions(visualkey PRIVATE IMGUI_IMPL_OPENGL_LOADER_GLAD=1)
+
 if(CMAKE_BUILD_TYPE MATCHES Debug)
   target_compile_definitions(visualkey PRIVATE VISUALKEY_DEBUG=1)
 endif()
@@ -115,6 +117,7 @@ target_link_libraries(visualkey PRIVATE ${MONO_LIBS})
 target_include_directories(visualkey PRIVATE ${CMAKE_SOURCE_DIR}/third/glad)
 target_include_directories(visualkey PRIVATE ${CMAKE_SOURCE_DIR}/third/stb)
 target_include_directories(visualkey PRIVATE ${CMAKE_SOURCE_DIR}/third/irrklang/include)
+target_include_directories(visualkey PRIVATE ${CMAKE_SOURCE_DIR}/third/imgui)
 target_include_directories(visualkey PRIVATE ${OPENGL_INCLUDE_DIR})
 target_include_directories(visualkey PRIVATE ${MONO_INCLUDE})
 

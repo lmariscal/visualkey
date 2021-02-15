@@ -6,6 +6,8 @@
 #include <glad.h>
 #include <GLFW/glfw3.h>
 
+#include "window.h"
+
 namespace visualkey {
 
   ShaderData *current = new ShaderData();
@@ -133,6 +135,9 @@ namespace visualkey {
 
   ShaderData *
   CreateShader(ShaderSource *source) {
+    GLFWwindow *current_context = glfwGetCurrentContext();
+    glfwMakeContextCurrent(GetDefaultWindow());
+
     ShaderData *data = new ShaderData();
 
     u32 vertex                = glCreateShader(GL_VERTEX_SHADER);
@@ -159,6 +164,7 @@ namespace visualkey {
     std::cout << "Created shader " << data->program << "\n";
 #endif
 
+    glfwMakeContextCurrent(current_context);
     return data;
   }
 

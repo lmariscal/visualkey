@@ -430,8 +430,8 @@ namespace visualkey {
     MonoClass *window_klass = mono_class_from_name(lib_image, "VisualKey", "Window");
     MonoObject *window_obj  = mono_object_new(domain, window_klass);
 
-    MonoClassField *field_window = mono_class_get_field_from_name(window_klass, "window");
-    mono_field_set_value(window_obj, field_window, &data->window);
+    MonoClassField *field_window = mono_class_get_field_from_name(window_klass, "id");
+    mono_field_set_value(window_obj, field_window, &data->id);
 
     return window_obj;
   }
@@ -440,16 +440,42 @@ namespace visualkey {
   ToWindowData(MonoObject *obj) {
     WindowData *data             = new WindowData();
     MonoClass *klass             = mono_object_get_class(obj);
-    MonoClassField *field_window = mono_class_get_field_from_name(klass, "window");
+    MonoClassField *field_window = mono_class_get_field_from_name(klass, "id");
 
     if (!field_window) {
       std::cerr << "obj is not a Window\n";
       return data;
     }
 
-    mono_field_get_value(obj, field_window, &data->window);
+    mono_field_get_value(obj, field_window, &data->id);
+    data->window = GetWindowFromID(data->id);
+
+    if (!data->window && !glfwWindowShouldClose(GetDefaultWindow())) {
+      std::cerr << "Trying to reference a no longer valid Window\n";
+      glfwSetWindowShouldClose(GetDefaultWindow(), true);
+    }
 
     return data;
+  }
+
+  bool
+  IsWindowValid(MonoObject *obj) {
+    WindowData *data             = new WindowData();
+    MonoClass *klass             = mono_object_get_class(obj);
+    MonoClassField *field_window = mono_class_get_field_from_name(klass, "id");
+
+    if (!field_window) {
+      std::cerr << "obj is not a Window\n";
+      return data;
+    }
+
+    mono_field_get_value(obj, field_window, &data->id);
+    data->window = GetWindowFromID(data->id);
+
+    bool isValid = data->window;
+
+    delete data;
+    return isValid;
   }
 
   void
@@ -458,8 +484,9 @@ namespace visualkey {
     WindowData *window_data = WindowCreate(width, height, u8_title);
 
     MonoClass *klass             = mono_object_get_class(recipient);
-    MonoClassField *field_window = mono_class_get_field_from_name(klass, "window");
-    mono_field_set_value(recipient, field_window, &window_data->window);
+    MonoClassField *field_window = mono_class_get_field_from_name(klass, "id");
+
+    mono_field_set_value(recipient, field_window, &window_data->id);
 
     delete window_data;
   }
@@ -490,8 +517,7 @@ namespace visualkey {
   void
   CloseWindowMono(MonoObject *window) {
     WindowData *data = ToWindowData(window);
-    MakeCurrent(data);
-    CloseWindow();
+    CloseWindow(data);
     delete data;
   }
 
@@ -507,7 +533,7 @@ namespace visualkey {
     MonoClass *mesh_klass = mono_class_from_name(lib_image, "VisualKey", "Mesh");
     MonoObject *mesh_obj  = mono_object_new(domain, mesh_klass);
 
-    MonoClassField *field_vao         = mono_class_get_field_from_name(mesh_klass, "vao");
+    // MonoClassField *field_vao         = mono_class_get_field_from_name(mesh_klass, "vao");
     MonoClassField *field_vbo_array   = mono_class_get_field_from_name(mesh_klass, "vboArray");
     MonoClassField *field_vbo_element = mono_class_get_field_from_name(mesh_klass, "vboElement");
     MonoClassField *field_vertices_count =
@@ -515,7 +541,7 @@ namespace visualkey {
     MonoClassField *field_indices_count =
       mono_class_get_field_from_name(mesh_klass, "indicesCount");
     MonoClassField *field_is_line = mono_class_get_field_from_name(mesh_klass, "isLine");
-    mono_field_set_value(mesh_obj, field_vao, &data->vao);
+    // mono_field_set_value(mesh_obj, field_vao, &data->vao);
     mono_field_set_value(mesh_obj, field_vbo_array, &data->vbo_array);
     mono_field_set_value(mesh_obj, field_vbo_element, &data->vbo_element);
     mono_field_set_value(mesh_obj, field_vertices_count, &data->vertices_count);
@@ -530,20 +556,21 @@ namespace visualkey {
     MeshData *data   = new MeshData();
     MonoClass *klass = mono_object_get_class(obj);
 
-    MonoClassField *field_vao            = mono_class_get_field_from_name(klass, "vao");
+    // MonoClassField *field_vao            = mono_class_get_field_from_name(klass, "vao");
     MonoClassField *field_vbo_array      = mono_class_get_field_from_name(klass, "vboArray");
     MonoClassField *field_vbo_element    = mono_class_get_field_from_name(klass, "vboElement");
     MonoClassField *field_vertices_count = mono_class_get_field_from_name(klass, "verticesCount");
     MonoClassField *field_indices_count  = mono_class_get_field_from_name(klass, "indicesCount");
     MonoClassField *field_is_line        = mono_class_get_field_from_name(klass, "isLine");
 
-    if (!field_vao || !field_vbo_array || !field_vbo_element || !field_vertices_count ||
-        !field_indices_count || !field_is_line) {
+    // if (!field_vao || !field_vbo_array || !field_vbo_element || !field_vertices_count ||
+    if (!field_vbo_array || !field_vbo_element || !field_vertices_count || !field_indices_count ||
+        !field_is_line) {
       std::cerr << "obj is not a Mesh\n";
       return data;
     }
 
-    mono_field_get_value(obj, field_vao, &data->vao);
+    // mono_field_get_value(obj, field_vao, &data->vao);
     mono_field_get_value(obj, field_vbo_array, &data->vbo_array);
     mono_field_get_value(obj, field_vbo_element, &data->vbo_element);
     mono_field_get_value(obj, field_vertices_count, &data->vertices_count);
@@ -570,15 +597,15 @@ namespace visualkey {
 
     MeshData *mesh_data = CreateMesh(vertices, indices, is_line);
 
-    MonoClass *klass                     = mono_object_get_class(recipient);
-    MonoClassField *field_vao            = mono_class_get_field_from_name(klass, "vao");
+    MonoClass *klass = mono_object_get_class(recipient);
+    // MonoClassField *field_vao            = mono_class_get_field_from_name(klass, "vao");
     MonoClassField *field_vbo_array      = mono_class_get_field_from_name(klass, "vboArray");
     MonoClassField *field_vbo_element    = mono_class_get_field_from_name(klass, "vboElement");
     MonoClassField *field_vertices_count = mono_class_get_field_from_name(klass, "verticesCount");
     MonoClassField *field_indices_count  = mono_class_get_field_from_name(klass, "indicesCount");
     MonoClassField *field_is_line        = mono_class_get_field_from_name(klass, "isLine");
 
-    mono_field_set_value(recipient, field_vao, &mesh_data->vao);
+    // mono_field_set_value(recipient, field_vao, &mesh_data->vao);
     mono_field_set_value(recipient, field_vbo_array, &mesh_data->vbo_array);
     mono_field_set_value(recipient, field_vbo_element, &mesh_data->vbo_element);
     mono_field_set_value(recipient, field_vertices_count, &mesh_data->vertices_count);
@@ -597,15 +624,15 @@ namespace visualkey {
 
     MeshData *mesh_data = CreateMesh(vertices, is_line);
 
-    MonoClass *klass                     = mono_object_get_class(recipient);
-    MonoClassField *field_vao            = mono_class_get_field_from_name(klass, "vao");
+    MonoClass *klass = mono_object_get_class(recipient);
+    // MonoClassField *field_vao            = mono_class_get_field_from_name(klass, "vao");
     MonoClassField *field_vbo_array      = mono_class_get_field_from_name(klass, "vboArray");
     MonoClassField *field_vbo_element    = mono_class_get_field_from_name(klass, "vboElement");
     MonoClassField *field_vertices_count = mono_class_get_field_from_name(klass, "verticesCount");
     MonoClassField *field_indices_count  = mono_class_get_field_from_name(klass, "indicesCount");
     MonoClassField *field_is_line        = mono_class_get_field_from_name(klass, "isLine");
 
-    mono_field_set_value(recipient, field_vao, &mesh_data->vao);
+    // mono_field_set_value(recipient, field_vao, &mesh_data->vao);
     mono_field_set_value(recipient, field_vbo_array, &mesh_data->vbo_array);
     mono_field_set_value(recipient, field_vbo_element, &mesh_data->vbo_element);
     mono_field_set_value(recipient, field_vertices_count, &mesh_data->vertices_count);
@@ -859,6 +886,7 @@ namespace visualkey {
     mono_add_internal_call("VisualKey.Window::CloseWindow", (const void *)CloseWindowMono);
     mono_add_internal_call("VisualKey.Window::SetOrtho", (const void *)SetOrtho);
     mono_add_internal_call("VisualKey.Window::GetOrtho", (const void *)IsOrtho);
+    mono_add_internal_call("VisualKey.Window::IsWindowValid", (const void *)IsWindowValid);
 
     mono_add_internal_call("VisualKey.Time::DeltaTime", (const void *)DeltaTime);
     mono_add_internal_call("VisualKey.Time::GetTime", (const void *)glfwGetTime);

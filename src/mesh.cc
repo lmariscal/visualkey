@@ -5,6 +5,7 @@
 #include <GLFW/glfw3.h>
 
 #include "shader.h"
+#include "window.h"
 
 namespace visualkey {
 
@@ -54,6 +55,9 @@ namespace visualkey {
 
   MeshData *
   CreateMesh(const std::vector<f32> &vertices, const std::vector<u32> &indices, bool is_line) {
+    GLFWwindow *current_context = glfwGetCurrentContext();
+    glfwMakeContextCurrent(GetDefaultWindow());
+
     MeshData *data       = new MeshData();
     data->indices_count  = indices.size();
     data->vertices_count = vertices.size();
@@ -61,8 +65,8 @@ namespace visualkey {
 
     glGenBuffers(1, &data->vbo_array);
     glGenBuffers(1, &data->vbo_element);
-    glGenVertexArrays(1, &data->vao);
-    glBindVertexArray(data->vao);
+    // glGenVertexArrays(1, &data->vao);
+    // glBindVertexArray(data->vao);
 
     glBindBuffer(GL_ARRAY_BUFFER, data->vbo_array);
     glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, data->vbo_element);
@@ -73,18 +77,14 @@ namespace visualkey {
                  &indices[0],
                  GL_STATIC_DRAW);
 
-    glEnableVertexAttribArray(0);
-    glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, sizeof(f32) * 5, (void *)0);
-    glEnableVertexAttribArray(1);
-    glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, sizeof(f32) * 5, (void *)(3 * sizeof(f32)));
-
 #ifdef VISUALKEY_DEBUG
-    std::cout << "Created mesh " << data->vao << "\n";
-    glBindVertexArray(0);
+    std::cout << "Created mesh " << data->vbo_array << "\n";
+    // glBindVertexArray(0);
     glBindBuffer(GL_ARRAY_BUFFER, 0);
     glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
 #endif
 
+    glfwMakeContextCurrent(current_context);
     return data;
   }
 
@@ -101,12 +101,22 @@ namespace visualkey {
     if (!glfwGetCurrentContext()) return;
     glDeleteBuffers(1, &data->vbo_array);
     glDeleteBuffers(1, &data->vbo_element);
-    glDeleteVertexArrays(1, &data->vao);
+    // glDeleteVertexArrays(1, &data->vao);
   }
 
   void
   DrawMesh(MeshData *data) {
-    glBindVertexArray(data->vao);
+    uint vao;
+    glGenVertexArrays(1, &vao);
+    glBindVertexArray(vao);
+
+    glBindBuffer(GL_ARRAY_BUFFER, data->vbo_array);
+    glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, data->vbo_element);
+
+    glEnableVertexAttribArray(0);
+    glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, sizeof(f32) * 5, (void *)0);
+    glEnableVertexAttribArray(1);
+    glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, sizeof(f32) * 5, (void *)(3 * sizeof(f32)));
 
     ShaderData *shader = GetCurrentShader();
     if (shader->program == GetUberShader()) {
@@ -121,9 +131,8 @@ namespace visualkey {
     else
       glDrawElements(GL_TRIANGLES, data->indices_count, GL_UNSIGNED_INT, (void *)0);
 
-#ifdef VISUALKEY_DEBUG
     glBindVertexArray(0);
-#endif
+    glDeleteVertexArrays(1, &vao);
   }
 
   void

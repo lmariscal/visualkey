@@ -5,7 +5,7 @@ namespace VisualKey {
 
   public class Window {
 #pragma warning disable 0169
-    private IntPtr window;
+    private uint id;
 #pragma warning restore 0169
 
     public Vec2 size {
@@ -37,6 +37,8 @@ namespace VisualKey {
     private extern static void SetOrtho(bool mode);
     [MethodImplAttribute(MethodImplOptions.InternalCall)]
     private extern static bool GetOrtho();
+    [MethodImplAttribute(MethodImplOptions.InternalCall)]
+    private extern static bool IsWindowValid(Window window);
 
     public static void SetOrtho() {
       SetOrtho(true);
@@ -87,6 +89,10 @@ namespace VisualKey {
 
     public void Close() {
       CloseWindow(this);
+    }
+
+    public bool IsValid() {
+      return IsWindowValid(this);
     }
   }
 

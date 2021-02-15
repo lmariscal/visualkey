@@ -7,6 +7,7 @@ struct GLFWwindow;
 namespace visualkey {
 
   struct WindowData {
+    u32 id             = 0;
     GLFWwindow *window = nullptr;
   };
 
@@ -16,6 +17,7 @@ namespace visualkey {
     std::string title); // Reverse name due to Windows already cotaining a func with that name
   GLFWwindow *GetFocusedWindow();
   GLFWwindow *GetDefaultWindow();
+  GLFWwindow *GetWindowFromID(u32 id);
   void DestroyWindow(WindowData *data);
   void MakeCurrent(WindowData *data);
   void InitGFX();
@@ -24,7 +26,8 @@ namespace visualkey {
   void SwapAllBuffers();
   void TerminateGFX();
   void ClearBackground(u32 r, u32 g, u32 b);
-  void CloseWindow();
+  void CloseCurrentWindow();
+  void CloseWindow(WindowData *data);
   void WindowSize(WindowData *data, u32 width, u32 height);
   void SetOrtho(bool mode);
   bool WindowFullscreen();

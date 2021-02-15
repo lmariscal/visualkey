@@ -1,4 +1,6 @@
 #include <iostream>
+#include <imgui.h>
+#include <backends/imgui_impl_opengl3.h>
 #include <filesystem>
 #include <GLFW/glfw3.h>
 #include "types.h"
@@ -91,29 +93,33 @@ void main() {\
   delete uber_source;
   SetUberShader(uber);
 
-  i32 perspective_loc = GetLocation(uber, "Perspective");
-  i32 color_loc       = GetLocation(uber, "Color");
-  i32 model_loc       = GetLocation(uber, "Model");
+  // i32 perspective_loc = GetLocation(uber, "Perspective");
+  i32 color_loc = GetLocation(uber, "Color");
+  i32 model_loc = GetLocation(uber, "Model");
 
-  while (WindowIsOpen(GetFocusedWindow())) {
+  while (WindowIsOpen(GetDefaultWindow())) {
     NewFrame();
     TranslateMesh({ 0.0f, 0.0f, 0.0f });
     RotateMesh({ 0.0f, 0.0f, 0.0f });
 
-    v2i size(0);
-    glfwGetWindowSize(glfwGetCurrentContext(), &size.x, &size.y);
-    m4 perspective = IsOrtho()
-      ? ortho(-(size.x / 2.0f), size.x / 2.0f, -(size.y / 2.0f), size.y / 2.0f)
-      : glm::perspective(radians(106.0f), (f32)size.x / (f32)size.y, 0.1f, 10000.0f);
+    // v2i size(0);
+    // glfwGetWindowSize(glfwGetCurrentContext(), &size.x, &size.y);
+    // m4 perspective = IsOrtho()
+    //   ? ortho(-(size.x / 2.0f), size.x / 2.0f, -(size.y / 2.0f), size.y / 2.0f)
+    //   : glm::perspective(radians(106.0f), (f32)size.x / (f32)size.y, 0.1f, 10000.0f);
     v4 default_color(250.0f / 255.0f, 250.0f / 255.0f, 250.0f / 255.0f, 1.0f);
     m4 model = m4(1.0f);
 
     DrawShader(uber);
-    SetMat4(uber, perspective_loc, perspective);
+    // SetMat4(uber, perspective_loc, perspective);
     SetMat4(uber, model_loc, model);
     SetVec4(uber, color_loc, default_color);
 
     MonoUpdate();
+
+    ImGui::Render();
+    // ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
+
     SwapAllBuffers();
   }
 
@@ -152,8 +158,6 @@ Command:\n\
   if (dir[0] != '/' && dir[0] != '.') dir = "./" + dir;
   if (dir[dir.length() - 1] == '/') dir.pop_back();
 #endif
-
-  std::cout << "dir: " << dir << '\n';
 
   if (command == "init") {
     InitProject(dir);

@@ -4,3 +4,6 @@
 [submodule "third/glm"]
 	path = third/glm
 	url = https://github.com/g-truc/glm.git
+[submodule "third/imgui"]
+	path = third/imgui
+	url = https://github.com/ocornut/imgui.git

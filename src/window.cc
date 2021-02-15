@@ -5,8 +5,13 @@
 #include <iostream>
 #include <stb_image.h>
 #include <vector>
+#include <imgui.h>
+#include <backends/imgui_impl_glfw.h>
+#include <backends/imgui_impl_opengl3.h>
+
 #include "iomanager.h"
 #include "icon.h"
+#include "shader.h"
 
 #define MAX(a, b) (((a) < (b)) ? (b) : (a))
 #define MIN(a, b) (((b) < (a)) ? (b) : (a))
@@ -18,6 +23,7 @@ namespace visualkey {
   GLFWwindow *default_window = nullptr;
   GLFWwindow *focused_window = nullptr;
   std::vector<WindowData *> windows;
+  std::vector<u32> destroyed_windows;
   bool is_ortho = true;
 
   void
@@ -104,12 +110,24 @@ namespace visualkey {
 
   void
   KeyEvent(GLFWwindow *window, i32 key, i32 scancode, i32 action, i32 mods) {
+    ImGui_ImplGlfw_KeyCallback(window, key, scancode, action, mods);
     KeyEvent(key, action != GLFW_RELEASE);
   }
 
   void
+  CharEvent(GLFWwindow *window, unsigned int c) {
+    ImGui_ImplGlfw_CharCallback(window, c);
+  }
+
+  void
   MouseButtonEvent(GLFWwindow *window, i32 button, i32 action, i32 mods) {
+    ImGui_ImplGlfw_MouseButtonCallback(window, button, action, mods);
     MouseButtonEvent(button, action != GLFW_RELEASE);
+  }
+
+  void
+  ScrollEvent(GLFWwindow *window, double xoffset, double yoffset) {
+    ImGui_ImplGlfw_ScrollCallback(window, xoffset, yoffset);
   }
 
   void
@@ -145,6 +163,7 @@ namespace visualkey {
     }
 
     glfwMakeContextCurrent(data->window);
+    data->id = windows.size() + 1;
 
     GLFWimage image;
     image.pixels = stbi_load_from_memory(icon, 4999, &image.width, &image.height, nullptr, 4);
@@ -158,7 +177,9 @@ namespace visualkey {
                      (mode->height / 2) - (height / 2));
 
     glfwSetKeyCallback(data->window, KeyEvent);
+    glfwSetCharCallback(data->window, CharEvent);
     glfwSetMouseButtonCallback(data->window, MouseButtonEvent);
+    glfwSetScrollCallback(data->window, ScrollEvent);
     glfwSetCursorPosCallback(data->window, MouseEvent);
     glfwSetWindowSizeCallback(data->window, WindowSizeEvent);
     glfwSetWindowFocusCallback(data->window, FocusEvent);
@@ -169,8 +190,12 @@ namespace visualkey {
 
     FocusEvent(data->window, 1);
 
+#if defined(VISUALKEY_DEBUG)
+    std::cout << "Created Window: " << data->id << '\n';
+#endif
     WindowData *copy = new WindowData();
     copy->window     = data->window;
+    copy->id         = data->id;
     windows.push_back(copy);
 
     return data;
@@ -178,14 +203,60 @@ namespace visualkey {
 
   void
   MakeCurrent(WindowData *data) {
+    if (!data->window) return;
+    if (!WindowIsOpen(data->window)) return;
     glfwMakeContextCurrent(data->window);
+
+    v2i window_size(0);
+    glfwGetWindowSize(data->window, &window_size.x, &window_size.y);
+    glViewport(0, 0, window_size.x, window_size.y);
+
+    ShaderData *current_shader = GetCurrentShader();
+    if (current_shader->program == GetUberShader()) {
+      v2i size(0);
+      glfwGetWindowSize(glfwGetCurrentContext(), &size.x, &size.y);
+      m4 perspective = IsOrtho()
+        ? ortho(-(size.x / 2.0f), size.x / 2.0f, -(size.y / 2.0f), size.y / 2.0f)
+        : glm::perspective(radians(106.0f), (f32)size.x / (f32)size.y, 0.1f, 10000.0f);
+
+      i32 perspective_loc = GetLocation(current_shader, "Perspective");
+      SetMat4(current_shader, perspective_loc, perspective);
+    }
+  }
+
+  GLFWwindow *
+  GetWindowFromID(u32 id) {
+    GLFWwindow *result = nullptr;
+    for (WindowData *data : windows) {
+      if (!data->window) continue;
+      if (id != data->id) continue;
+      result = data->window;
+      break;
+    }
+    return result;
   }
 
   void
   DestroyWindow(WindowData *data) {
+    if (!data->window) return;
+    if (glfwGetCurrentContext() == data->window) glfwMakeContextCurrent(default_window);
+
+#if defined(VISUALKEY_DEBUG)
+    std::cout << "Destroying window: " << data->id << '\n';
+#endif
+
+    // bool is_destroyed = false;
+    // for (u32 other_id : destroyed_windows)
+    //   if (other_id == data->id) is_destroyed = true;
+    // if (is_destroyed) return;
+
     glfwDestroyWindow(data->window);
-    for (WindowData *window_data : windows)
-      if (window_data->window == data->window) window_data->window = nullptr;
+
+    for (WindowData *window_data : windows) {
+      if (!window_data->window) continue;
+      if (data->id != window_data->id) continue;
+      window_data->window = nullptr;
+    }
   }
 
   void
@@ -227,7 +298,9 @@ namespace visualkey {
                      (mode->height / 2) - (720 / 2));
 
     glfwSetKeyCallback(default_window, KeyEvent);
+    glfwSetCharCallback(default_window, CharEvent);
     glfwSetMouseButtonCallback(default_window, MouseButtonEvent);
+    glfwSetScrollCallback(default_window, ScrollEvent);
     glfwSetCursorPosCallback(default_window, MouseEvent);
     glfwSetWindowSizeCallback(default_window, WindowSizeEvent);
     glfwSetWindowFocusCallback(default_window, FocusEvent);
@@ -242,6 +315,16 @@ namespace visualkey {
     glEnable(GL_DEPTH_TEST);
     glEnable(GL_BLEND);
     glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+
+    IMGUI_CHECKVERSION();
+    ImGui::CreateContext();
+    ImGuiIO &io = ImGui::GetIO();
+    (void)io;
+
+    ImGui::StyleColorsDark();
+
+    ImGui_ImplGlfw_InitForOpenGL(default_window, false);
+    ImGui_ImplOpenGL3_Init("#version 150");
   }
 
   GLFWwindow *
@@ -256,8 +339,35 @@ namespace visualkey {
 
   void
   NewFrame() {
+    bool one_window_open        = false;
+    GLFWwindow *current_context = glfwGetCurrentContext();
+
+    for (WindowData *data : windows) {
+      if (!data->window) continue;
+      if (!WindowIsOpen(data->window)) continue;
+      one_window_open = true;
+
+      glfwMakeContextCurrent(data->window);
+      glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+    }
+
+    glfwMakeContextCurrent(current_context);
+    if (!one_window_open) glfwSetWindowShouldClose(default_window, true);
+
     glfwPollEvents();
     UpdatePads();
+
+    for (WindowData *data : windows) {
+      if (!data->window) continue;
+      if (WindowIsOpen(data->window)) continue;
+      DestroyWindow(data);
+    }
+
+    ImGui_ImplOpenGL3_NewFrame();
+    ImGui_ImplGlfw_NewFrame();
+    ImGui::NewFrame();
+
+    ImGui::ShowDemoWindow();
 
     f32 now    = glfwGetTime();
     delta_time = now - last_time;
@@ -266,33 +376,46 @@ namespace visualkey {
 
   void
   SwapBuffers(GLFWwindow *window) {
+    if (!WindowIsOpen(window)) return;
     glfwSwapBuffers(window);
   }
 
   void
   SwapAllBuffers() {
     for (WindowData *data : windows) {
-      if (data->window) SwapBuffers(data->window);
+      if (!data->window) continue;
+      SwapBuffers(data->window);
     }
   }
 
   void
   TerminateGFX() {
+    ImGui_ImplOpenGL3_Shutdown();
+    ImGui_ImplGlfw_Shutdown();
+    ImGui::DestroyContext();
+
     glfwDestroyWindow(default_window);
     glfwTerminate();
 
-    for (WindowData *data : windows)
+    for (WindowData *data : windows) {
+      if (data->window) DestroyWindow(data);
       delete data;
+    }
   }
 
   void
   ClearBackground(u32 r, u32 g, u32 b) {
     glClearColor(r / 255.0f, g / 255.0f, b / 255.0f, 1.0f);
-    glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
   }
 
   void
-  CloseWindow() {
+  CloseWindow(WindowData *data) {
+    if (!data->window) return;
+    glfwSetWindowShouldClose(data->window, true);
+  }
+
+  void
+  CloseCurrentWindow() {
     GLFWwindow *window = glfwGetCurrentContext();
     glfwSetWindowShouldClose(window, true);
   }
@@ -310,12 +433,14 @@ namespace visualkey {
 
   void
   WindowSize(WindowData *data, u32 width, u32 height) {
+    if (!data->window) return;
     glfwSetWindowSize(data->window, width, height);
   }
 
   v2i
   GetWindowSize(WindowData *data) {
     v2i result(0);
+    if (!data->window) return result;
     glfwGetWindowSize(data->window, &result.x, &result.y);
     return result;
   }

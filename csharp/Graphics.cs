@@ -25,7 +25,7 @@ namespace VisualKey {
 
   public class Mesh {
 #pragma warning disable 0169
-    private uint vao;
+    // private uint vao;
     private uint vboArray;
     private uint vboElement;
     private uint verticesCount;
