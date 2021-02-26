@@ -1,4 +1,5 @@
 using System.Runtime.CompilerServices;
+using System.Collections;
 using System;
 
 namespace VisualKey {
@@ -251,18 +252,68 @@ namespace VisualKey {
   public class Sphere {
     public Mesh mesh { get; private set; }
 
-    public Sphere(float width, float height) {
-      float[] vertices = {
-         (width / 2.0f),  (height / 2.0f), 0.0f,  1.0f, 1.0f,
-         (width / 2.0f), -(height / 2.0f), 0.0f,  1.0f, 0.0f,
-        -(width / 2.0f), -(height / 2.0f), 0.0f,  0.0f, 0.0f,
-        -(width / 2.0f),  (height / 2.0f), 0.0f,  0.0f, 1.0f
-      };
-      uint[] indices = {
-        0, 1, 3,
-        1, 2, 3
-      };
-      mesh = new Mesh(vertices, indices);
+    public Sphere(float radius, uint sectors, uint stacks) {
+      ArrayList vertices = new ArrayList();
+      // ArrayList<float> normals = new ArrayList();
+      // ArrayList<float> texture = new ArrayList();
+      ArrayList indices = new ArrayList();
+
+      float x, y, z, xy;
+      // float nx, ny, nz, lengthInv = 1.0f / radius;
+      float u, v;
+
+      float sectorStep = 2.0f * MathF.PI / sectors;
+      float stackStep = MathF.PI / stacks;
+      float sectorAngle, stackAngle;
+
+      for (int i = 0; i <= stacks; ++i) {
+        stackAngle = MathF.PI / 2 - i * stackStep;
+        xy = radius * MathF.Cos(stackAngle);
+        z = radius * MathF.Sin(stackAngle);
+
+        for (int j = 0; j<= sectors; ++j) {
+          sectorAngle = j * sectorStep;
+
+          x = xy * MathF.Cos(sectorAngle);
+          y = xy * MathF.Sin(sectorAngle);
+          vertices.Add(x);
+          vertices.Add(y);
+          vertices.Add(z);
+
+          // nx = x * lengthInv;
+          // ny = y * lengthInv;
+          // nz = z * lengthInv;
+          // vertices.add(nx);
+          // vertices.add(ny);
+          // vertices.add(nz);
+
+          u = (float)j / sectors;
+          v = (float)i / stacks;
+          vertices.Add(u);
+          vertices.Add(v);
+        }
+      }
+
+      uint k1, k2;
+      for (int i = 0; i < stacks; ++i) {
+        k1 = (uint)i * (sectors + 1);
+        k2 = k1 + sectors + 1;
+
+        for (int j = 0; j < sectors; ++j, ++k1, ++k2) {
+          if (1 != 0) {
+            indices.Add(k1);
+            indices.Add(k2);
+            indices.Add(k1 + 1);
+          }
+          if (i != stacks - 1) {
+            indices.Add(k1 + 1);
+            indices.Add(k2);
+            indices.Add(k2 + 1);
+          }
+        }
+      }
+
+      mesh = new Mesh((float[])vertices.ToArray(typeof(float)), (uint[])indices.ToArray(typeof(uint)));
     }
 
     public void Draw() {

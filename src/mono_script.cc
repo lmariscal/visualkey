@@ -683,6 +683,8 @@ namespace visualkey {
   CreateTextureMono(MonoString *image_path, MonoObject *recipient) {
     std::string u8_path = mono_string_to_utf8(image_path);
 
+    std::cout << "path: " << u8_path << '\n';
+
     ImageData *image = CreateImage(path + u8_path);
 
     MonoClass *klass         = mono_object_get_class(recipient);
@@ -707,6 +709,14 @@ namespace visualkey {
     ImageData *image = ToImageData(obj);
     DrawImage(image);
     delete image;
+  }
+
+  void
+  SetNoneTexture() {
+    ShaderData *shader = GetCurrentShader();
+    i32 is_texture_loc = GetLocation(shader, "IsTexture", false);
+    SetInt(shader, is_texture_loc, 0);
+    DrawImage(nullptr);
   }
 
   void
@@ -924,6 +934,7 @@ namespace visualkey {
     mono_add_internal_call("VisualKey.Texture::CreateTexture", (const void *)CreateTextureMono);
     mono_add_internal_call("VisualKey.Texture::DestroyTexture", (const void *)DestroyTextureMono);
     mono_add_internal_call("VisualKey.Texture::DrawTexture", (const void *)DrawTextureMono);
+    mono_add_internal_call("VisualKey.Texture::SetNoneTexture", (const void *)SetNoneTexture);
 
     mono_add_internal_call("VisualKey.Color::DrawColor", (const void *)DrawColorMono);
 

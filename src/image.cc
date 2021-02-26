@@ -12,7 +12,7 @@ namespace visualkey {
   CreateImage(std::string path) {
     ImageData *image_data = new ImageData();
     i32 width, height, channels;
-    uchar *data = stbi_load(path.c_str(), &width, &height, &channels, 0);
+    uchar *data = stbi_load(path.c_str(), &width, &height, &channels, 3);
 
     if (!data) {
       std::cerr << "Failed to load image " << path << '\n';
@@ -21,6 +21,9 @@ namespace visualkey {
 
     glGenTextures(1, &image_data->texture);
     glBindTexture(GL_TEXTURE_2D, image_data->texture);
+
+    glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR);
+    glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
 
     glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, width, height, 0, GL_RGB, GL_UNSIGNED_BYTE, data);
     glGenerateMipmap(GL_TEXTURE_2D);
@@ -41,6 +44,10 @@ namespace visualkey {
 
   void
   DrawImage(ImageData *data) {
+    if (!data) {
+      glBindTexture(GL_TEXTURE_2D, 0);
+      return;
+    }
     glBindTexture(GL_TEXTURE_2D, data->texture);
   }
 

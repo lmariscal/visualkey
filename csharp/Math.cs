@@ -450,6 +450,7 @@ namespace VisualKey {
                       0, 0, 1);
     }
     public static Mat3 zero() { return new Mat3(0); }
+    public static Mat3 one() { return new Mat3(1); }
 
     public Mat3(float n) {
       row0 = new Vec3(n);
@@ -546,6 +547,7 @@ namespace VisualKey {
                       0, 0, 0, 1);
     }
     public static Mat4 zero() { return new Mat4(0); }
+    public static Mat4 one() { return new Mat4(1); }
 
     public Mat4(float n) {
       row0 = new Vec4(n);

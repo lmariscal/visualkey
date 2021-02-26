@@ -101,6 +101,7 @@ void main() {\
     NewFrame();
     TranslateMesh({ 0.0f, 0.0f, 0.0f });
     RotateMesh({ 0.0f, 0.0f, 0.0f });
+    DrawImage(nullptr);
 
     // v2i size(0);
     // glfwGetWindowSize(glfwGetCurrentContext(), &size.x, &size.y);

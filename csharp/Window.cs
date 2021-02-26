@@ -40,12 +40,14 @@ namespace VisualKey {
     [MethodImplAttribute(MethodImplOptions.InternalCall)]
     private extern static bool IsWindowValid(Window window);
 
-    public static void SetOrtho() {
+    public void SetOrtho() {
       SetOrtho(true);
+      this.MakeCurrent();
     }
 
-    public static void SetPerspective() {
+    public void SetPerspective() {
       SetOrtho(false);
+      this.MakeCurrent();
     }
 
     public static bool IsOrtho() {

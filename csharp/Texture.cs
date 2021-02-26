@@ -14,6 +14,12 @@ namespace VisualKey {
     private extern static void DestroyTexture(Texture texture);
     [MethodImplAttribute(MethodImplOptions.InternalCall)]
     private extern static void DrawTexture(Texture texture);
+    [MethodImplAttribute(MethodImplOptions.InternalCall)]
+    private extern static void SetNoneTexture();
+
+    static public void SetNone() {
+      SetNoneTexture();
+    }
 
     public Texture(string path) {
       CreateTexture(path, this);
@@ -43,7 +49,7 @@ namespace VisualKey {
     }
 
     public Color(uint r, uint g, uint b, float a) {
-      this.color = new Vec4(r / 255.0f, g / 255.0f, b / 255.0f, a > 1.0f ? a / 100.0f : 1.0f);
+      this.color = new Vec4(r / 255.0f, g / 255.0f, b / 255.0f, a / 100.0f);
     }
 
     public Color(uint r, uint g, uint b) {
