@@ -76,12 +76,20 @@ namespace VisualKey {
   public class Line {
     public Mesh mesh { get; private set; }
 
-    public Line(float p0x, float p0y, float p1x, float p1y) {
+    private void CreateLine(float p0x, float p0y, float p1x, float p1y) {
       float[] vertices = {
         p0x, p0y, 0.0f, 0.0f, 0.0f,
         p1x, p1y, 0.0f, 0.0f, 0.0f
       };
       mesh = new Mesh(vertices, true);
+    }
+
+    public Line(float p0x, float p0y, float p1x, float p1y) {
+      CreateLine(p0x, p0y, p1x, p1y);
+    }
+
+    public Line(Vec2 p0, Vec2 p1) {
+      CreateLine(p0.x, p0.y, p1.x, p1.y);
     }
 
     public void Draw() {
@@ -163,7 +171,8 @@ namespace VisualKey {
       vertices[3] = 0.5f;
       vertices[4] = 0.5f;
 
-      var increment = 2.0f * MathF.PI / steps;
+      Console.WriteLine("Here?");
+      var increment = 2.0f * MathF.PI / (steps - 1);
       var i = 1;
       for (float angle = 0.0f; angle <= 2.0f * MathF.PI; angle += increment) {
         var x = (radius * MathF.Cos(angle)) / 2.0f;
@@ -176,6 +185,7 @@ namespace VisualKey {
         vertices[(i * 5) + 4] = ty;
         i++;
       }
+      Console.WriteLine("Here?");
 
       for (uint n = 0; n < steps - 1; ++n) {
         indices[(n * 3)] = 0;
@@ -319,6 +329,67 @@ namespace VisualKey {
     public void Draw() {
       mesh.Draw();
     }
+  }
+
+  public class QuadraticBezier {
+
+    Vec2 p0, p1, p2;
+
+    public QuadraticBezier(Vec2 p0, Vec2 p1, Vec2 p2) {
+      this.p0 = p0;
+      this.p1 = p1;
+      this.p2 = p2;
+    }
+
+    public void Step(float t, ref Vec2 res) {
+      res.x = MathF.Pow(1 - t, 2) * p0.x + (1 - t) * 2 * t * p1.x + t * t * p2.x;
+      res.y = MathF.Pow(1 - t, 2) * p0.y + (1 - t) * 2 * t * p1.y + t * t * p2.y;
+    }
+
+    public void Draw(uint steps) {
+      Vec2[] bezierSteps = new Vec2[steps];
+      for (int i = 0; i < bezierSteps.Length; ++i) {
+        float t = (float)i / (float)(bezierSteps.Length - 1);
+        bezierSteps[i] = new Vec2(0);
+        this.Step(t, ref bezierSteps[i]);
+      }
+      for (int i = 0; i < bezierSteps.Length - 1; ++i) {
+        Line l = new Line(bezierSteps[i], bezierSteps[i + 1]);
+        l.Draw();
+      }
+    }
+
+  }
+
+  public class CubicBezier {
+
+    Vec2 p0, p1, p2, p3;
+
+    public CubicBezier(Vec2 p0, Vec2 p1, Vec2 p2, Vec2 p3) {
+      this.p0 = p0;
+      this.p1 = p1;
+      this.p2 = p2;
+      this.p3 = p3;
+    }
+
+    public void Step(float t, ref Vec2 res) {
+      res.x = MathF.Pow(1 - t, 3) * p0.x + MathF.Pow(1 - t, 2) * 3 * t * p1.x + (1 - t) * 3 * t * t * p2.x + t * t * t * p3.x;
+      res.y = MathF.Pow(1 - t, 3) * p0.y + MathF.Pow(1 - t, 2) * 3 * t * p1.y + (1 - t) * 3 * t * t * p2.y + t * t * t * p3.y;
+    }
+
+    public void Draw(uint steps) {
+      Vec2[] bezierSteps = new Vec2[steps];
+      for (int i = 0; i < bezierSteps.Length; ++i) {
+        float t = (float)i / (float)(bezierSteps.Length - 1);
+        bezierSteps[i] = new Vec2(0);
+        this.Step(t, ref bezierSteps[i]);
+      }
+      for (int i = 0; i < bezierSteps.Length - 1; ++i) {
+        Line l = new Line(bezierSteps[i], bezierSteps[i + 1]);
+        l.Draw();
+      }
+    }
+
   }
 
 }

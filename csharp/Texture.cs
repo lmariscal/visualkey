@@ -48,12 +48,8 @@ namespace VisualKey {
       this.color = new Vec4(color / 255.0f, 1.0f);
     }
 
-    public Color(uint r, uint g, uint b, float a) {
+    public Color(uint r, uint g, uint b, uint a = 100) {
       this.color = new Vec4(r / 255.0f, g / 255.0f, b / 255.0f, a / 100.0f);
-    }
-
-    public Color(uint r, uint g, uint b) {
-      this.color = new Vec4(r, g, b, 1.0f);
     }
 
     public void SetColor(Vec4 color) {

@@ -100,7 +100,8 @@ void main() {\
   while (WindowIsOpen(GetDefaultWindow())) {
     NewFrame();
     TranslateMesh({ 0.0f, 0.0f, 0.0f });
-    RotateMesh({ 0.0f, 0.0f, 0.0f });
+    quat identity(1.0, 0.0, 0.0, 0.0);
+    SetRotation(identity);
     DrawImage(nullptr);
 
     // v2i size(0);

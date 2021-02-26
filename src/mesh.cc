@@ -34,7 +34,7 @@ namespace visualkey {
 
   void
   RotateMesh(v3 value) {
-    quat identity;
+    quat identity(1.0, 0.0, 0.0, 0.0);
     rotation = rotate(identity, value);
   }
 
@@ -98,6 +98,9 @@ namespace visualkey {
 
   void
   DestroyMesh(MeshData *data) {
+#ifdef VISUALKEY_DEBUG
+    std::cout << "Destroyed mesh " << data->vbo_array << "\n";
+#endif
     if (!glfwGetCurrentContext()) return;
     glDeleteBuffers(1, &data->vbo_array);
     glDeleteBuffers(1, &data->vbo_element);
