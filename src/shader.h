@@ -35,5 +35,6 @@ namespace visualkey {
   void SetVec4(ShaderData *data, i32 location, v4 &vec);
   void SetMat3(ShaderData *data, i32 location, m3 &mat);
   void SetMat4(ShaderData *data, i32 location, m4 &mat);
+  void SetVec3A(ShaderData *data, i32 location, std::vector<f32> &array);
 
 }

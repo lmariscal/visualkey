@@ -1,8 +1,7 @@
 #include <iostream>
-#include <imgui.h>
-#include <backends/imgui_impl_opengl3.h>
 #include <filesystem>
 #include <GLFW/glfw3.h>
+
 #include "types.h"
 #include "window.h"
 #include "mono_script.h"
@@ -10,6 +9,7 @@
 #include "mesh.h"
 #include "image.h"
 #include "audio.h"
+#include "light.h"
 
 using namespace visualkey;
 
@@ -75,7 +75,7 @@ void main() {\
 \
   FragPos = vec3(Model * vec4(vPos, 1.0));\
   TexCoord = vTexCoord;\
-  Normal = vNormal;\
+  Normal = mat3(transpose(inverse(Model))) * vNormal;\
 }\
   ",
     "\
@@ -87,18 +87,30 @@ in vec3 FragPos;\
 \
 uniform bool IsTexture;\
 uniform vec4 Color;\
-uniform vec3 LightPos;\
+uniform int NumberLightSources;\
+uniform vec3 LightSources[256];\
 uniform sampler2D Texture;\
 uniform float AmbientLight;\
 \
+layout (location = 0) out vec4 OutColor;\
+\
 void main() {\
   vec4 result = texture(Texture, TexCoord) + Color;\
+  vec3 lightColor = vec3(1.0f, 1.0f, 1.0f);\
 \
-  result.xyz *= AmbientLight;\
+  vec3 diffuse = vec3(0.0f, 0.0f, 0.0f);\
+\
   vec3 norm = normalize(Normal);\
-  vec3 lightDir = normalize(LightPos - FragPos);\
+  for (int i = 0; i < NumberLightSources; ++i) {\
+    vec3 lightPos = LightSources[i];\
+    vec3 lightDir = normalize(lightPos - FragPos);\
+    float diff = max(dot(norm, lightDir), 0.0);\
+    diffuse += diff * lightColor;\
+  }\
 \
-  gl_FragColor = result;\
+  result.xyz *= AmbientLight + diffuse;\
+\
+  OutColor = result;\
 }\
   ");
   ShaderData *uber = CreateShader(uber_source);
@@ -139,10 +151,9 @@ void main() {\
     SetFloat(uber, ambient_light_loc, 1.0f);
     SetMat4(uber, view_loc, m4_indentity);
     SetVec4(uber, color_loc, default_color);
+    DisableLightSystem();
 
     MonoUpdate();
-
-    RenderImGuiFrame();
 
     SwapAllBuffers();
   }

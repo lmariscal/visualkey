@@ -4,5 +4,5 @@
 
 obj/
 .vsk/
+.run/
 .vscode/
-imgui.ini

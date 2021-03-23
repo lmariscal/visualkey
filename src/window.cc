@@ -5,9 +5,6 @@
 #include <iostream>
 #include <stb_image.h>
 #include <vector>
-#include <imgui.h>
-#include <backends/imgui_impl_glfw.h>
-#include <backends/imgui_impl_opengl3.h>
 
 #include "iomanager.h"
 #include "icon.h"
@@ -25,8 +22,7 @@ namespace visualkey {
   GLFWwindow *focused_window = nullptr;
   std::vector<WindowData *> windows;
   std::vector<u32> destroyed_windows;
-  bool is_ortho          = true;
-  bool imgui_is_in_frame = false;
+  bool is_ortho = true;
 
   WindowData *
   GetWindowsFirst() {
@@ -126,25 +122,19 @@ namespace visualkey {
 
   void
   KeyEvent(GLFWwindow *window, i32 key, i32 scancode, i32 action, i32 mods) {
-    ImGui_ImplGlfw_KeyCallback(window, key, scancode, action, mods);
     if (action != GLFW_REPEAT) KeyEvent(key, action != GLFW_RELEASE);
   }
 
   void
-  CharEvent(GLFWwindow *window, unsigned int c) {
-    ImGui_ImplGlfw_CharCallback(window, c);
-  }
+  CharEvent(GLFWwindow *window, unsigned int c) {}
 
   void
   MouseButtonEvent(GLFWwindow *window, i32 button, i32 action, i32 mods) {
-    ImGui_ImplGlfw_MouseButtonCallback(window, button, action, mods);
     MouseButtonEvent(button, action != GLFW_RELEASE);
   }
 
   void
-  ScrollEvent(GLFWwindow *window, double xoffset, double yoffset) {
-    ImGui_ImplGlfw_ScrollCallback(window, xoffset, yoffset);
-  }
+  ScrollEvent(GLFWwindow *window, double xoffset, double yoffset) {}
 
   void
   MouseEvent(GLFWwindow *window, f64 x, f64 y) {
@@ -222,23 +212,6 @@ namespace visualkey {
   }
 
   void
-  RenderImGuiFrame() {
-    if (!imgui_is_in_frame) return;
-    ImGui::Render();
-    ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
-    imgui_is_in_frame = false;
-  }
-
-  void
-  NewImGuiFrame() {
-    if (imgui_is_in_frame) RenderImGuiFrame();
-    ImGui_ImplOpenGL3_NewFrame();
-    ImGui_ImplGlfw_NewFrame();
-    ImGui::NewFrame();
-    imgui_is_in_frame = true;
-  }
-
-  void
   MakeCurrent(WindowData *data) {
     if (!data->window) return;
     if (!WindowIsOpen(data->window)) return;
@@ -259,8 +232,6 @@ namespace visualkey {
       i32 perspective_loc = GetLocation(current_shader, "Projection");
       SetMat4(current_shader, perspective_loc, perspective);
     }
-
-    NewImGuiFrame();
   }
 
   GLFWwindow *
@@ -358,16 +329,6 @@ namespace visualkey {
     glEnable(GL_DEPTH_TEST);
     glEnable(GL_BLEND);
     glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
-
-    IMGUI_CHECKVERSION();
-    ImGui::CreateContext();
-    ImGuiIO &io = ImGui::GetIO();
-    (void)io;
-
-    ImGui::StyleColorsDark();
-
-    ImGui_ImplGlfw_InitForOpenGL(default_window, false);
-    ImGui_ImplOpenGL3_Init("#version 150");
   }
 
   GLFWwindow *
@@ -427,10 +388,6 @@ namespace visualkey {
 
   void
   TerminateGFX() {
-    ImGui_ImplOpenGL3_Shutdown();
-    ImGui_ImplGlfw_Shutdown();
-    ImGui::DestroyContext();
-
     glfwDestroyWindow(default_window);
     glfwTerminate();
 

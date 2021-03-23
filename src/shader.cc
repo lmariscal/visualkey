@@ -245,4 +245,10 @@ namespace visualkey {
     glUniform1f(location, val);
   }
 
+  void
+  SetVec3A(ShaderData *data, i32 location, std::vector<f32> &array) {
+    DrawShader(data);
+    glUniform3fv(location, array.size(), array.data());
+  }
+
 }

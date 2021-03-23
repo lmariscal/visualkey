@@ -396,10 +396,29 @@ namespace VisualKey {
 
   public class Light {
 
+    private uint id;
+
     [MethodImplAttribute(MethodImplOptions.InternalCall)]
     private extern static void EnableLightSystem();
     [MethodImplAttribute(MethodImplOptions.InternalCall)]
     private extern static void DisableLightSystem();
+    [MethodImplAttribute(MethodImplOptions.InternalCall)]
+    private extern static uint CreateLightSource(Vec3 position);
+    [MethodImplAttribute(MethodImplOptions.InternalCall)]
+    private extern static void DestroyLightSource(uint id);
+    [MethodImplAttribute(MethodImplOptions.InternalCall)]
+    private extern static void ChangePosition(uint id, Vec3 position);
+
+    private Vec3 _position;
+    public Vec3 position {
+      get {
+        return _position;
+      }
+      set {
+        ChangePosition(this.id, value);
+        this._position = value;
+      }
+    }
 
     public static void Enable() {
       EnableLightSystem();
@@ -407,6 +426,14 @@ namespace VisualKey {
 
     public static void Disable() {
       DisableLightSystem();
+    }
+
+    public Light(Vec3 pos) {
+      this.id = CreateLightSource(pos);
+    }
+
+    ~Light() {
+      DestroyLightSource(this.id);
     }
 
   }

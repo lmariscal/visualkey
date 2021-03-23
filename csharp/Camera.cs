@@ -3,14 +3,16 @@ using System;
 namespace VisualKey {
 
   public class Camera {
-    Shader shader;
-    Vec3 position;
-    Vec3 front;
-    Vec3 up; // Camera up, not world up
-    Vec2 euler;
+    public Shader shader { private get; set; }
+
     Vec2 lastMousePos;
+    Vec3 up; // Camera up, not world up
     Mat4 view;
     bool firstMouseDelta = true;
+
+    public Vec3 position;
+    public Vec3 front;
+    public Vec2 euler;
 
     public Camera() {
       shader = Shader.GetUberShader();
@@ -63,22 +65,6 @@ namespace VisualKey {
       this.front.z = (float)Math.Sin(MathV.Radians(euler.x)) * (float)Math.Cos(MathV.Radians(euler.y));
 
       this.front = this.front.Normalize();
-    }
-
-    public void SetPosition(Vec3 position) {
-      this.position = position;
-    }
-
-    public void SetEuler(Vec2 euler) {
-      this.euler = euler;
-    }
-
-    public void SetFront(Vec3 front) {
-      this.front = front;
-    }
-
-    public void SetShader(Shader shader) {
-      this.shader = shader;
     }
 
     public Mat4 GetView() {

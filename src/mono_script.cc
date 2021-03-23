@@ -684,8 +684,6 @@ namespace visualkey {
   CreateTextureMono(MonoString *image_path, MonoObject *recipient) {
     std::string u8_path = mono_string_to_utf8(image_path);
 
-    std::cout << "path: " << u8_path << '\n';
-
     ImageData *image = CreateImage(path + u8_path);
 
     MonoClass *klass         = mono_object_get_class(recipient);
@@ -912,6 +910,18 @@ namespace visualkey {
     delete data;
   }
 
+  u32
+  CreateLightSourceMono(MonoObject *obj) {
+    vec3 pos = ToVec3(obj);
+    return CreateLightSource(pos);
+  }
+
+  void
+  ChangeLightPositionMono(u32 id, MonoObject *obj) {
+    vec3 pos = ToVec3(obj);
+    ChangeLightPosition(id, pos);
+  }
+
   void
   AddFeatures() {
     mono_add_internal_call("VisualKey.Window::CreateWindow", (const void *)CreateWindowMono);
@@ -947,6 +957,11 @@ namespace visualkey {
 
     mono_add_internal_call("VisualKey.Light::EnableLightSystem", (const void *)EnableLightSystem);
     mono_add_internal_call("VisualKey.Light::DisableLightSystem", (const void *)DisableLightSystem);
+    mono_add_internal_call("VisualKey.Light::CreateLightSource",
+                           (const void *)CreateLightSourceMono);
+    mono_add_internal_call("VisualKey.Light::DestroyLightSource", (const void *)DestroyLightSource);
+    mono_add_internal_call("VisualKey.Light::ChangePosition",
+                           (const void *)ChangeLightPositionMono);
 
     mono_add_internal_call("VisualKey.Stash::NewStash", (const void *)NewStash);
     mono_add_internal_call("VisualKey.Stash::PopStash", (const void *)PopStash);

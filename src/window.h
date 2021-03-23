@@ -32,8 +32,6 @@ namespace visualkey {
   void WindowSize(WindowData *data, u32 width, u32 height);
   void SetOrtho();
   void SetPerspective(f32 fov);
-  void RenderImGuiFrame();
-  void NewImGuiFrame();
   bool WindowFullscreen();
   bool WindowIsOpen(GLFWwindow *window);
   bool IsOrtho();
