@@ -11,6 +11,7 @@ class App {
   }
 
   void Update() {
+    window.Background(33, 33, 33);
     rectangle.Draw();
   }
 

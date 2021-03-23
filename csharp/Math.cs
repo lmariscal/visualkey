@@ -106,7 +106,10 @@ namespace VisualKey {
     }
 
     public Vec2 Normalize() {
-      return this / this.Magnitude();
+      var magnitude = this.Magnitude();
+      if (magnitude == 0)
+        return new Vec2(0); // Technically not correct, but prefer than NaN
+      return this / magnitude;
     }
 
     public float Dot(Vec2 other) {
@@ -249,7 +252,10 @@ namespace VisualKey {
     }
 
     public Vec3 Normalize() {
-      return this / this.Magnitude();
+      var magnitude = this.Magnitude();
+      if (magnitude == 0)
+        return new Vec3(0); // Technically not correct, but prefer than NaN
+      return this / magnitude;
     }
 
     public float Dot(Vec3 other) {
@@ -405,7 +411,10 @@ namespace VisualKey {
     }
 
     public Vec4 Normalize() {
-      return this / this.Magnitude();
+      var magnitude = this.Magnitude();
+      if (magnitude == 0)
+        return new Vec4(0); // Technically not correct, but prefer than NaN
+      return this / magnitude;
     }
 
     public float Dot(Vec4 other) {
@@ -634,13 +643,24 @@ namespace VisualKey {
 
     public static Mat4 LookAt(Vec3 eye, Vec3 at, Vec3 up) {
       Vec3 f = (at - eye).Normalize();
-      Vec3 s = f.Cross(up).Normalize();
-      Vec3 u = s.Cross(f).Normalize();
+      Vec3 s = up.Cross(f).Normalize();
+      Vec3 u = f.Cross(s);
+      Mat4 res = Mat4.identity();
 
-      return new Mat4(s.x,  s.y,  s.z, -s.Dot(eye),
-                  u.x,  u.y,  u.z, -u.Dot(eye),
-                 -f.x, -f.y, -f.z,  f.Dot(eye),
-                    0,    0,    0,  1);
+      res[0][0] = s.x;
+      res[1][0] = s.y;
+      res[2][0] = s.z;
+      res[0][1] = u.x;
+      res[1][1] = u.y;
+      res[2][1] = u.z;
+      res[0][2] = f.x;
+      res[1][2] = f.y;
+      res[2][2] = f.z;
+      res[3][0] = -s.Dot(eye);
+      res[3][1] = -u.Dot(eye);
+      res[3][2] = -f.Dot(eye);
+
+      return res;
     }
 
     public static Mat4 Ortho(float left, float right, float bottom, float top, float zNear, float zFar) {

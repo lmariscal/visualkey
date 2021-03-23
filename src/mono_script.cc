@@ -450,7 +450,7 @@ namespace visualkey {
     mono_field_get_value(obj, field_window, &data->id);
     data->window = GetWindowFromID(data->id);
 
-    if (!data->window && !glfwWindowShouldClose(GetDefaultWindow())) {
+    if (!data->window && WindowIsOpen(GetDefaultWindow())) {
       std::cerr << "Trying to reference a no longer valid Window\n";
       glfwSetWindowShouldClose(GetDefaultWindow(), true);
     }
@@ -762,8 +762,21 @@ namespace visualkey {
   void
   DestroyShaderMono(MonoObject *obj) {
     ShaderData *shader = ToShaderData(obj);
-    DestroyShader(shader);
+    if (GetUberShader() != shader->program) DestroyShader(shader);
     delete shader;
+  }
+
+  MonoObject *
+  GetUberShaderMono() {
+    u32 shader = GetUberShader();
+
+    MonoClass *shader_klass  = mono_class_from_name(lib_image, "VisualKey", "Shader");
+    MonoObject *recipient    = mono_object_new(domain, shader_klass);
+    MonoClass *klass         = mono_object_get_class(recipient);
+    MonoClassField *field_id = mono_class_get_field_from_name(klass, "program");
+    mono_field_set_value(recipient, field_id, &shader);
+
+    return recipient;
   }
 
   void
@@ -884,6 +897,20 @@ namespace visualkey {
   }
 
   void
+  CursorNormal(MonoObject *window) {
+    WindowData *data = ToWindowData(window);
+    glfwSetInputMode(data->window, GLFW_CURSOR, GLFW_CURSOR_NORMAL);
+    delete data;
+  }
+
+  void
+  CursorHidden(MonoObject *window) {
+    WindowData *data = ToWindowData(window);
+    glfwSetInputMode(data->window, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
+    delete data;
+  }
+
+  void
   AddFeatures() {
     mono_add_internal_call("VisualKey.Window::CreateWindow", (const void *)CreateWindowMono);
     mono_add_internal_call("VisualKey.Window::DestroyWindow", (const void *)DestroyWindowMono);
@@ -894,9 +921,12 @@ namespace visualkey {
     mono_add_internal_call("VisualKey.Window::MakeCurrentWindow",
                            (const void *)MakeCurrentWindowMono);
     mono_add_internal_call("VisualKey.Window::CloseWindow", (const void *)CloseWindowMono);
+    mono_add_internal_call("VisualKey.Window::SetPerspective", (const void *)SetPerspective);
     mono_add_internal_call("VisualKey.Window::SetOrtho", (const void *)SetOrtho);
     mono_add_internal_call("VisualKey.Window::GetOrtho", (const void *)IsOrtho);
     mono_add_internal_call("VisualKey.Window::IsWindowValid", (const void *)IsWindowValid);
+    mono_add_internal_call("VisualKey.Window::CursorNormal", (const void *)CursorNormal);
+    mono_add_internal_call("VisualKey.Window::CursorHidden", (const void *)CursorHidden);
 
     mono_add_internal_call("VisualKey.Time::DeltaTime", (const void *)DeltaTime);
     mono_add_internal_call("VisualKey.Time::GetTime", (const void *)glfwGetTime);
@@ -939,6 +969,7 @@ namespace visualkey {
     mono_add_internal_call("VisualKey.Color::DrawColor", (const void *)DrawColorMono);
 
     mono_add_internal_call("VisualKey.Shader::CreateShader", (const void *)CreateShaderMono);
+    mono_add_internal_call("VisualKey.Shader::GetUberShader", (const void *)GetUberShaderMono);
     mono_add_internal_call("VisualKey.Shader::DestroyShader", (const void *)DestroyShaderMono);
     mono_add_internal_call("VisualKey.Shader::DrawShader", (const void *)DrawShaderMono);
     mono_add_internal_call("VisualKey.Shader::GetLocation", (const void *)ShaderGetLocation);

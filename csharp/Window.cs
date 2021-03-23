@@ -34,21 +34,18 @@ namespace VisualKey {
     [MethodImplAttribute(MethodImplOptions.InternalCall)]
     private extern static void DestroyWindow(Window window);
     [MethodImplAttribute(MethodImplOptions.InternalCall)]
-    private extern static void SetOrtho(bool mode);
-    [MethodImplAttribute(MethodImplOptions.InternalCall)]
     private extern static bool GetOrtho();
     [MethodImplAttribute(MethodImplOptions.InternalCall)]
     private extern static bool IsWindowValid(Window window);
+    [MethodImplAttribute(MethodImplOptions.InternalCall)]
+    private extern static void CursorHidden(Window window);
+    [MethodImplAttribute(MethodImplOptions.InternalCall)]
+    private extern static void CursorNormal(Window window);
 
-    public void SetOrtho() {
-      SetOrtho(true);
-      this.MakeCurrent();
-    }
-
-    public void SetPerspective() {
-      SetOrtho(false);
-      this.MakeCurrent();
-    }
+    [MethodImplAttribute(MethodImplOptions.InternalCall)]
+    public extern static void SetPerspective(float fov);
+    [MethodImplAttribute(MethodImplOptions.InternalCall)]
+    public extern static void SetOrtho();
 
     public static bool IsOrtho() {
       return GetOrtho();
@@ -68,6 +65,14 @@ namespace VisualKey {
 
     ~Window() {
       DestroyWindow(this);
+    }
+
+    public void HideCursor() {
+      CursorHidden(this);
+    }
+
+    public void ShowCursor() {
+      CursorNormal(this);
     }
 
     public void Background(uint r, uint g, uint b) {

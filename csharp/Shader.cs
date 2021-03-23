@@ -29,6 +29,9 @@ namespace VisualKey {
     [MethodImplAttribute(MethodImplOptions.InternalCall)]
     private extern static void SetMat4(Shader shader, int location, Mat4 val);
 
+    [MethodImplAttribute(MethodImplOptions.InternalCall)]
+    public extern static Shader GetUberShader();
+
     public Shader(string path) {
       CreateShader(path, this);
     }
@@ -43,6 +46,10 @@ namespace VisualKey {
 
     public int GetLocation(string name) {
       return GetLocation(this, name);
+    }
+
+    public uint GetProgram() {
+      return program;
     }
 
     public void SetInt(int location, int val) {

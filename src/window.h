@@ -15,6 +15,7 @@ namespace visualkey {
     u32 width,
     u32 height,
     std::string title); // Reverse name due to Windows already cotaining a func with that name
+  WindowData *GetWindowsFirst();
   GLFWwindow *GetFocusedWindow();
   GLFWwindow *GetDefaultWindow();
   GLFWwindow *GetWindowFromID(u32 id);
@@ -29,7 +30,10 @@ namespace visualkey {
   void CloseCurrentWindow();
   void CloseWindow(WindowData *data);
   void WindowSize(WindowData *data, u32 width, u32 height);
-  void SetOrtho(bool mode);
+  void SetOrtho();
+  void SetPerspective(f32 fov);
+  void RenderImGuiFrame();
+  void NewImGuiFrame();
   bool WindowFullscreen();
   bool WindowIsOpen(GLFWwindow *window);
   bool IsOrtho();

@@ -53,8 +53,6 @@ RunProject(const std::string &dir) {
   InitGFX();
   InitAudio(dir);
   InitMono();
-  MonoCompile(dir);
-  MonoStart();
 
   ShaderSource *uber_source = ReadShader(
     "\
@@ -65,11 +63,12 @@ layout (location = 1) in vec2 vTexCoord;\
 \
 out vec2 TexCoord;\
 \
-uniform mat4 Perspective;\
+uniform mat4 Projection;\
+uniform mat4 View;\
 uniform mat4 Model;\
 \
 void main() {\
-  gl_Position = Perspective * Model * vec4(vPos, 1.0);\
+  gl_Position = Projection * View * Model * vec4(vPos, 1.0);\
   TexCoord = vTexCoord;\
 }\
   ",
@@ -96,13 +95,25 @@ void main() {\
   // i32 perspective_loc = GetLocation(uber, "Perspective");
   i32 color_loc = GetLocation(uber, "Color");
   i32 model_loc = GetLocation(uber, "Model");
+  i32 view_loc  = GetLocation(uber, "View");
+
+  m4 test_view = lookAtLH(vec3(0, 0, -10), vec3(0, 0, 0), vec3(0, 1, 0));
+  std::cout << "test_view:\n" << to_string(test_view) << '\n';
+
+  MonoCompile(dir);
+  MonoStart();
 
   while (WindowIsOpen(GetDefaultWindow())) {
     NewFrame();
+
     TranslateMesh({ 0.0f, 0.0f, 0.0f });
     quat identity(1.0, 0.0, 0.0, 0.0);
     SetRotation(identity);
     DrawImage(nullptr);
+
+    WindowData *data = GetWindowsFirst();
+    if (!data) break;
+    MakeCurrent(data);
 
     // v2i size(0);
     // glfwGetWindowSize(glfwGetCurrentContext(), &size.x, &size.y);
@@ -110,17 +121,17 @@ void main() {\
     //   ? ortho(-(size.x / 2.0f), size.x / 2.0f, -(size.y / 2.0f), size.y / 2.0f)
     //   : glm::perspective(radians(106.0f), (f32)size.x / (f32)size.y, 0.1f, 10000.0f);
     v4 default_color(250.0f / 255.0f, 250.0f / 255.0f, 250.0f / 255.0f, 1.0f);
-    m4 model = m4(1.0f);
+    m4 m4_indentity = m4(1.0f);
 
     DrawShader(uber);
     // SetMat4(uber, perspective_loc, perspective);
-    SetMat4(uber, model_loc, model);
+    SetMat4(uber, model_loc, m4_indentity);
+    SetMat4(uber, view_loc, m4_indentity);
     SetVec4(uber, color_loc, default_color);
 
     MonoUpdate();
 
-    ImGui::Render();
-    // ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
+    RenderImGuiFrame();
 
     SwapAllBuffers();
   }

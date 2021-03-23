@@ -20,15 +20,31 @@ namespace visualkey {
 
   f32 last_time              = 0;
   f32 delta_time             = 0;
+  f32 perspective_fov        = radians(90.0f);
   GLFWwindow *default_window = nullptr;
   GLFWwindow *focused_window = nullptr;
   std::vector<WindowData *> windows;
   std::vector<u32> destroyed_windows;
-  bool is_ortho = true;
+  bool is_ortho          = true;
+  bool imgui_is_in_frame = false;
+
+  WindowData *
+  GetWindowsFirst() {
+    for (WindowData *wd : windows) {
+      if (wd->window && wd->id != 0) return wd;
+    }
+    return nullptr;
+  }
 
   void
-  SetOrtho(bool mode) {
-    is_ortho = mode;
+  SetOrtho() {
+    is_ortho = true;
+  }
+
+  void
+  SetPerspective(f32 fov) {
+    is_ortho        = false;
+    perspective_fov = fov;
   }
 
   bool
@@ -111,7 +127,7 @@ namespace visualkey {
   void
   KeyEvent(GLFWwindow *window, i32 key, i32 scancode, i32 action, i32 mods) {
     ImGui_ImplGlfw_KeyCallback(window, key, scancode, action, mods);
-    KeyEvent(key, action != GLFW_RELEASE);
+    if (action != GLFW_REPEAT) KeyEvent(key, action != GLFW_RELEASE);
   }
 
   void
@@ -184,6 +200,10 @@ namespace visualkey {
     glfwSetWindowSizeCallback(data->window, WindowSizeEvent);
     glfwSetWindowFocusCallback(data->window, FocusEvent);
 
+    vec<2, f64> mouse_pos;
+    glfwGetCursorPos(data->window, &mouse_pos.x, &mouse_pos.y);
+    MouseEvent(mouse_pos.x, mouse_pos.y);
+
     glEnable(GL_DEPTH_TEST);
     glEnable(GL_BLEND);
     glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
@@ -202,6 +222,23 @@ namespace visualkey {
   }
 
   void
+  RenderImGuiFrame() {
+    if (!imgui_is_in_frame) return;
+    ImGui::Render();
+    ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
+    imgui_is_in_frame = false;
+  }
+
+  void
+  NewImGuiFrame() {
+    if (imgui_is_in_frame) RenderImGuiFrame();
+    ImGui_ImplOpenGL3_NewFrame();
+    ImGui_ImplGlfw_NewFrame();
+    ImGui::NewFrame();
+    imgui_is_in_frame = true;
+  }
+
+  void
   MakeCurrent(WindowData *data) {
     if (!data->window) return;
     if (!WindowIsOpen(data->window)) return;
@@ -217,11 +254,13 @@ namespace visualkey {
       glfwGetWindowSize(glfwGetCurrentContext(), &size.x, &size.y);
       m4 perspective = IsOrtho()
         ? ortho(-(size.x / 2.0f), size.x / 2.0f, -(size.y / 2.0f), size.y / 2.0f)
-        : glm::perspective(radians(106.0f), (f32)size.x / (f32)size.y, 0.1f, 10000.0f);
+        : glm::perspective(perspective_fov, (f32)size.x / (f32)size.y, 0.1f, 100.0f);
 
-      i32 perspective_loc = GetLocation(current_shader, "Perspective");
+      i32 perspective_loc = GetLocation(current_shader, "Projection");
       SetMat4(current_shader, perspective_loc, perspective);
     }
+
+    NewImGuiFrame();
   }
 
   GLFWwindow *
@@ -252,11 +291,15 @@ namespace visualkey {
 
     glfwDestroyWindow(data->window);
 
+    bool one_open = false;
     for (WindowData *window_data : windows) {
       if (!window_data->window) continue;
+      if (WindowIsOpen(window_data->window)) one_open = true;
       if (data->id != window_data->id) continue;
       window_data->window = nullptr;
     }
+
+    if (!one_open) glfwSetWindowShouldClose(GetDefaultWindow(), true);
   }
 
   void
@@ -362,12 +405,6 @@ namespace visualkey {
       if (WindowIsOpen(data->window)) continue;
       DestroyWindow(data);
     }
-
-    ImGui_ImplOpenGL3_NewFrame();
-    ImGui_ImplGlfw_NewFrame();
-    ImGui::NewFrame();
-
-    ImGui::ShowDemoWindow();
 
     f32 now    = glfwGetTime();
     delta_time = now - last_time;
