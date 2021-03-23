@@ -10,6 +10,7 @@ set(VISUALKEY_SOURCES
   audio.cc
   utils.cc
   light.cc
+  text.cc
 )
 
 if(NOT DEFINED OpenGL_GL_PREFERENCE)
@@ -109,6 +110,7 @@ endif()
 
 target_link_libraries(visualkey PRIVATE glfw)
 target_link_libraries(visualkey PRIVATE glm)
+target_link_libraries(visualkey PRIVATE freetype)
 target_link_libraries(visualkey PRIVATE IrrKlang)
 target_link_libraries(visualkey PRIVATE OpenGL::GL)
 target_link_libraries(visualkey PRIVATE ${MONO_LIBS})
@@ -167,7 +169,12 @@ add_dependencies(visualkey visualkey_cs_release)
 # etc/
 
 file(MAKE_DIRECTORY ${CMAKE_BINARY_DIR}/dist/etc)
+file(MAKE_DIRECTORY ${CMAKE_BINARY_DIR}/dist/etc/fonts)
 file(MAKE_DIRECTORY ${CMAKE_BINARY_DIR}/dist/etc/mono)
+
+file(COPY "${CMAKE_SOURCE_DIR}/third/jetbrains_mono/JetBrainsMono-Regular.ttf" DESTINATION "${CMAKE_BINARY_DIR}/dist/etc/fonts")
+file(COPY "${CMAKE_SOURCE_DIR}/third/jetbrains_mono/OFL.txt" DESTINATION "${CMAKE_BINARY_DIR}/dist/etc/fonts")
+file(COPY "${CMAKE_SOURCE_DIR}/third/jetbrains_mono/AUTHORS.txt" DESTINATION "${CMAKE_BINARY_DIR}/dist/etc/fonts")
 
 if(NOT MONO_ETC)
   if(WIN32)

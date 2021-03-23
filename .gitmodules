@@ -4,3 +4,6 @@
 [submodule "third/glm"]
 	path = third/glm
 	url = https://github.com/g-truc/glm.git
+[submodule "third/freetype"]
+	path = third/freetype
+	url = https://gitlab.freedesktop.org/freetype/freetype.git

@@ -36,6 +36,7 @@ namespace visualkey {
   bool WindowIsOpen(GLFWwindow *window);
   bool IsOrtho();
   f32 DeltaTime();
+  f32 GetPerspectiveFOV();
   v2i GetWindowSize(WindowData *data);
 
 }

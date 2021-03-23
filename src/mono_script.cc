@@ -14,6 +14,7 @@
 #include "utils.h"
 #include "audio.h"
 #include "light.h"
+#include "text.h"
 
 #if defined(WIN32) || defined(_WIN32)
 #include <windows.h>
@@ -50,7 +51,7 @@ namespace visualkey {
   InitProjectMono(const std::string &dir) {
     path = dir;
     if (dir.at(dir.size() - 1) != '/' && dir.at(dir.size() - 1) != '\\') path += "/";
-    std::string template_path = ExePath() + "/../template/";
+    std::string template_path = DistPath() + "/template/";
 
     std::string name;
 
@@ -82,7 +83,7 @@ namespace visualkey {
       str.replace(start_pos, from.length(), to);
       return true;
     };
-    std::string dist_path = std::filesystem::path(ExePath()).parent_path().string();
+    std::string dist_path = std::filesystem::path(DistPath()).string();
 
     // csproj
 
@@ -120,13 +121,13 @@ namespace visualkey {
 
 #if defined(WIN32) || defined(_WIN32)
 #if defined(VISUALKEY_DEBUG)
-    std::string command = ExePath() + "/../mono/mcs " + path + "*.cs /out:" + path +
-      ".vsk/App.dll /target:library /debug /optimize /w:4 /nologo /reference:" + ExePath() +
-      "/../api/Debug/VisualKey.dll";
+    std::string command = DistPath() + "/mono/mcs " + path + "*.cs /out:" + path +
+      ".vsk/App.dll /target:library /debug /optimize /w:4 /nologo /reference:" + DistPath() +
+      "/api/Debug/VisualKey.dll";
 #else
-    std::string command = ExePath() + "/../mono/mcs " + path + "*.cs /out:" + path +
-      ".vsk/App.dll /target:library /debug /optimize /w:4 /nologo /reference:" + ExePath() +
-      "/../api/Release/VisualKey.dll";
+    std::string command = DistPath() + "/mono/mcs " + path + "*.cs /out:" + path +
+      ".vsk/App.dll /target:library /debug /optimize /w:4 /nologo /reference:" + DistPath() +
+      "/api/Release/VisualKey.dll";
 #endif
     i32 ret = system(command.c_str());
     if (ret != 0) {
@@ -137,12 +138,12 @@ namespace visualkey {
 #elif defined(__linux__)
 #if defined(VISUALKEY_DEBUG)
     std::string command = "mcs " + path + "*.cs /out:" + path +
-      ".vsk/App.dll /target:library /debug /optimize /w:4 /nologo /reference:" + ExePath() +
-      "/../api/Debug/VisualKey.dll";
+      ".vsk/App.dll /target:library /debug /optimize /w:4 /nologo /reference:" + DistPath() +
+      "/api/Debug/VisualKey.dll";
 #else
     std::string command = "mcs " + path + "*.cs /out:" + path +
-      ".vsk/App.dll /target:library /debug /optimize /w:4 /nologo /reference:" + ExePath() +
-      "/../api/Release/VisualKey.dll";
+      ".vsk/App.dll /target:library /debug /optimize /w:4 /nologo /reference:" + DistPath() +
+      "/api/Release/VisualKey.dll";
 #endif
     i32 ret = system(command.c_str());
     if (ret != 0) {
@@ -157,10 +158,10 @@ namespace visualkey {
     std::string name = path;
     name += ".vsk/App.dll";
 
-    mono_set_dirs(std::string(ExePath() + "/../lib").c_str(),
-                  std::string(ExePath() + "/../etc").c_str());
+    mono_set_dirs(std::string(DistPath() + "/lib").c_str(),
+                  std::string(DistPath() + "/etc").c_str());
 
-    mono_set_assemblies_path(ExePath().c_str());
+    mono_set_assemblies_path(std::string(DistPath() + "/bin").c_str());
 
 #if defined(__linux__)
     mono_dllmap_insert(NULL, "i:System.Native", NULL, "libmono-native.so", NULL);
@@ -178,7 +179,7 @@ namespace visualkey {
       return;
     }
 
-    std::string lib = ExePath() + "/../api/Release/VisualKey.dll";
+    std::string lib = DistPath() + "/api/Release/VisualKey.dll";
 
     lib_assembly = mono_domain_assembly_open(domain, lib.c_str());
     if (!lib_assembly) {
@@ -923,6 +924,14 @@ namespace visualkey {
   }
 
   void
+  RenderTextMono(MonoString *text_obj, f32 scale, MonoObject *color_obj) {
+    std::string text = mono_string_to_utf8(text_obj);
+    v3 color         = ToVec3(color_obj);
+
+    RenderText(text, scale, color);
+  }
+
+  void
   AddFeatures() {
     mono_add_internal_call("VisualKey.Window::CreateWindow", (const void *)CreateWindowMono);
     mono_add_internal_call("VisualKey.Window::DestroyWindow", (const void *)DestroyWindowMono);
@@ -962,6 +971,8 @@ namespace visualkey {
     mono_add_internal_call("VisualKey.Light::DestroyLightSource", (const void *)DestroyLightSource);
     mono_add_internal_call("VisualKey.Light::ChangePosition",
                            (const void *)ChangeLightPositionMono);
+
+    mono_add_internal_call("VisualKey.Text::RenderText", (const void *)RenderTextMono);
 
     mono_add_internal_call("VisualKey.Stash::NewStash", (const void *)NewStash);
     mono_add_internal_call("VisualKey.Stash::PopStash", (const void *)PopStash);

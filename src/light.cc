@@ -9,10 +9,12 @@ namespace visualkey {
   // Yep, next time plan an ECS system...
   std::map<u32, vec3> light_sources;
   std::vector<u32> dropped_keys;
-  u32 ids = 0;
+  u32 ids             = 0;
+  bool lights_enabled = false;
 
   void
   EnableLightSystem() {
+    if (lights_enabled) return;
     ShaderData *shader           = GetCurrentShader();
     i32 number_light_sources_loc = GetLocation(shader, "NumberLightSources");
     i32 light_sources_loc        = GetLocation(shader, "LightSources");
@@ -31,16 +33,19 @@ namespace visualkey {
     }
 
     SetVec3A(shader, light_sources_loc, lights);
+    lights_enabled = true;
   }
 
   void
   DisableLightSystem() {
+    if (!lights_enabled) return;
     ShaderData *shader           = GetCurrentShader();
     i32 number_light_sources_loc = GetLocation(shader, "NumberLightSources");
     i32 ambient_light_loc        = GetLocation(shader, "AmbientLight");
 
     SetFloat(shader, ambient_light_loc, 1.0f);
     SetInt(shader, number_light_sources_loc, 0);
+    lights_enabled = false;
   }
 
   void

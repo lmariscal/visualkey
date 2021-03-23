@@ -37,6 +37,11 @@ namespace visualkey {
     is_ortho = true;
   }
 
+  f32
+  GetPerspectiveFOV() {
+    return perspective_fov;
+  }
+
   void
   SetPerspective(f32 fov) {
     is_ortho        = false;
@@ -155,7 +160,7 @@ namespace visualkey {
     glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 2);
     glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
     glfwWindowHint(GLFW_REFRESH_RATE, GLFW_DONT_CARE);
-    glfwWindowHint(GLFW_RESIZABLE, GLFW_FALSE);
+    glfwWindowHint(GLFW_RESIZABLE, GLFW_TRUE);
     glfwWindowHint(GLFW_VISIBLE, GLFW_TRUE);
 #ifdef __APPLE__
     glfwWindowHint(GLFW_OPENGL_FORWARD_COMPAT, GL_TRUE);
@@ -194,9 +199,15 @@ namespace visualkey {
     glfwGetCursorPos(data->window, &mouse_pos.x, &mouse_pos.y);
     MouseEvent(mouse_pos.x, mouse_pos.y);
 
-    glEnable(GL_DEPTH_TEST);
     glEnable(GL_BLEND);
     glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+
+    glEnable(GL_DEPTH_TEST);
+    glDepthFunc(GL_LEQUAL);
+
+    glEnable(GL_CULL_FACE);
+    glCullFace(GL_BACK);
+    glFrontFace(GL_CCW);
 
     FocusEvent(data->window, 1);
 
@@ -325,10 +336,6 @@ namespace visualkey {
       glfwTerminate();
       return;
     }
-
-    glEnable(GL_DEPTH_TEST);
-    glEnable(GL_BLEND);
-    glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
   }
 
   GLFWwindow *

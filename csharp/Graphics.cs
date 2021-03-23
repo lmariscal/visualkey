@@ -108,8 +108,8 @@ namespace VisualKey {
         -(width / 2.0f),  (height / 2.0f), 0.0f,  0.0f, 1.0f,  0.0f, 0.0f, 0.0f
       };
       uint[] indices = {
-        0, 1, 3,
-        1, 2, 3
+        0, 2, 1,
+        2, 0, 3
       };
       mesh = new Mesh(vertices, indices);
     }
@@ -147,8 +147,8 @@ namespace VisualKey {
         x4, y4, 0.0f,  0.0f, 1.0f,  0.0f, 0.0f, 0.0f
       };
       uint[] indices = {
-        0, 1, 3,
-        1, 2, 3
+        0, 2, 1,
+        2, 0, 3
       };
       mesh = new Mesh(vertices, indices);
     }
@@ -210,19 +210,19 @@ namespace VisualKey {
 
     public Cube(float width, float height, float depth) {
       float[] vertices = {
-        -(width / 2.0f), -(height / 2.0f), -(depth / 2.0f),  0.0f, 0.0f,  0.0f,  0.0f, -1.0f,
-         (width / 2.0f), -(height / 2.0f), -(depth / 2.0f),  1.0f, 0.0f,  0.0f,  0.0f, -1.0f,
-         (width / 2.0f),  (height / 2.0f), -(depth / 2.0f),  1.0f, 1.0f,  0.0f,  0.0f, -1.0f,
-         (width / 2.0f),  (height / 2.0f), -(depth / 2.0f),  1.0f, 1.0f,  0.0f,  0.0f, -1.0f,
-        -(width / 2.0f),  (height / 2.0f), -(depth / 2.0f),  0.0f, 1.0f,  0.0f,  0.0f, -1.0f,
-        -(width / 2.0f), -(height / 2.0f), -(depth / 2.0f),  0.0f, 0.0f,  0.0f,  0.0f, -1.0f,
+        -(width / 2.0f), -(height / 2.0f), -(depth / 2.0f),  0.0f, 0.0f,   0.0f,  0.0f, -1.0f,
+         (width / 2.0f),  (height / 2.0f), -(depth / 2.0f),  1.0f, 1.0f,   0.0f,  0.0f, -1.0f,
+         (width / 2.0f), -(height / 2.0f), -(depth / 2.0f),  1.0f, 0.0f,   0.0f,  0.0f, -1.0f,
+         (width / 2.0f),  (height / 2.0f), -(depth / 2.0f),  1.0f, 1.0f,   0.0f,  0.0f, -1.0f,
+        -(width / 2.0f), -(height / 2.0f), -(depth / 2.0f),  0.0f, 0.0f,   0.0f,  0.0f, -1.0f,
+        -(width / 2.0f),  (height / 2.0f), -(depth / 2.0f),  0.0f, 1.0f,   0.0f,  0.0f, -1.0f,
 
-        -(width / 2.0f), -(height / 2.0f),  (depth / 2.0f),  0.0f, 0.0f,  0.0f,  0.0f, 1.0f,
-         (width / 2.0f), -(height / 2.0f),  (depth / 2.0f),  1.0f, 0.0f,  0.0f,  0.0f, 1.0f,
-         (width / 2.0f),  (height / 2.0f),  (depth / 2.0f),  1.0f, 1.0f,  0.0f,  0.0f, 1.0f,
-         (width / 2.0f),  (height / 2.0f),  (depth / 2.0f),  1.0f, 1.0f,  0.0f,  0.0f, 1.0f,
-        -(width / 2.0f),  (height / 2.0f),  (depth / 2.0f),  0.0f, 1.0f,  0.0f,  0.0f, 1.0f,
-        -(width / 2.0f), -(height / 2.0f),  (depth / 2.0f),  0.0f, 0.0f,  0.0f,  0.0f, 1.0f,
+        -(width / 2.0f), -(height / 2.0f),  (depth / 2.0f),  0.0f, 0.0f,   0.0f,  0.0f,  1.0f,
+         (width / 2.0f), -(height / 2.0f),  (depth / 2.0f),  1.0f, 0.0f,   0.0f,  0.0f,  1.0f,
+         (width / 2.0f),  (height / 2.0f),  (depth / 2.0f),  1.0f, 1.0f,   0.0f,  0.0f,  1.0f,
+         (width / 2.0f),  (height / 2.0f),  (depth / 2.0f),  1.0f, 1.0f,   0.0f,  0.0f,  1.0f,
+        -(width / 2.0f),  (height / 2.0f),  (depth / 2.0f),  0.0f, 1.0f,   0.0f,  0.0f,  1.0f,
+        -(width / 2.0f), -(height / 2.0f),  (depth / 2.0f),  0.0f, 0.0f,   0.0f,  0.0f,  1.0f,
 
         -(width / 2.0f),  (height / 2.0f),  (depth / 2.0f),  1.0f, 0.0f,  -1.0f,  0.0f,  0.0f,
         -(width / 2.0f),  (height / 2.0f), -(depth / 2.0f),  1.0f, 1.0f,  -1.0f,  0.0f,  0.0f,
@@ -231,26 +231,26 @@ namespace VisualKey {
         -(width / 2.0f), -(height / 2.0f),  (depth / 2.0f),  0.0f, 0.0f,  -1.0f,  0.0f,  0.0f,
         -(width / 2.0f),  (height / 2.0f),  (depth / 2.0f),  1.0f, 0.0f,  -1.0f,  0.0f,  0.0f,
 
-         (width / 2.0f),  (height / 2.0f),  (depth / 2.0f),  1.0f, 0.0f,  1.0f,  0.0f,  0.0f,
-         (width / 2.0f),  (height / 2.0f), -(depth / 2.0f),  1.0f, 1.0f,  1.0f,  0.0f,  0.0f,
-         (width / 2.0f), -(height / 2.0f), -(depth / 2.0f),  0.0f, 1.0f,  1.0f,  0.0f,  0.0f,
-         (width / 2.0f), -(height / 2.0f), -(depth / 2.0f),  0.0f, 1.0f,  1.0f,  0.0f,  0.0f,
-         (width / 2.0f), -(height / 2.0f),  (depth / 2.0f),  0.0f, 0.0f,  1.0f,  0.0f,  0.0f,
-         (width / 2.0f),  (height / 2.0f),  (depth / 2.0f),  1.0f, 0.0f,  1.0f,  0.0f,  0.0f,
+         (width / 2.0f),  (height / 2.0f),  (depth / 2.0f),  1.0f, 0.0f,   1.0f,  0.0f,  0.0f,
+         (width / 2.0f), -(height / 2.0f), -(depth / 2.0f),  0.0f, 1.0f,   1.0f,  0.0f,  0.0f,
+         (width / 2.0f),  (height / 2.0f), -(depth / 2.0f),  1.0f, 1.0f,   1.0f,  0.0f,  0.0f,
+         (width / 2.0f), -(height / 2.0f), -(depth / 2.0f),  0.0f, 1.0f,   1.0f,  0.0f,  0.0f,
+         (width / 2.0f),  (height / 2.0f),  (depth / 2.0f),  1.0f, 0.0f,   1.0f,  0.0f,  0.0f,
+         (width / 2.0f), -(height / 2.0f),  (depth / 2.0f),  0.0f, 0.0f,   1.0f,  0.0f,  0.0f,
 
-        -(width / 2.0f), -(height / 2.0f), -(depth / 2.0f),  0.0f, 1.0f,  0.0f, -1.0f,  0.0f,
-         (width / 2.0f), -(height / 2.0f), -(depth / 2.0f),  1.0f, 1.0f,  0.0f, -1.0f,  0.0f,
-         (width / 2.0f), -(height / 2.0f),  (depth / 2.0f),  1.0f, 0.0f,  0.0f, -1.0f,  0.0f,
-         (width / 2.0f), -(height / 2.0f),  (depth / 2.0f),  1.0f, 0.0f,  0.0f, -1.0f,  0.0f,
-        -(width / 2.0f), -(height / 2.0f),  (depth / 2.0f),  0.0f, 0.0f,  0.0f, -1.0f,  0.0f,
-        -(width / 2.0f), -(height / 2.0f), -(depth / 2.0f),  0.0f, 1.0f,  0.0f, -1.0f,  0.0f,
+        -(width / 2.0f), -(height / 2.0f), -(depth / 2.0f),  0.0f, 1.0f,   0.0f, -1.0f,  0.0f,
+         (width / 2.0f), -(height / 2.0f), -(depth / 2.0f),  1.0f, 1.0f,   0.0f, -1.0f,  0.0f,
+         (width / 2.0f), -(height / 2.0f),  (depth / 2.0f),  1.0f, 0.0f,   0.0f, -1.0f,  0.0f,
+         (width / 2.0f), -(height / 2.0f),  (depth / 2.0f),  1.0f, 0.0f,   0.0f, -1.0f,  0.0f,
+        -(width / 2.0f), -(height / 2.0f),  (depth / 2.0f),  0.0f, 0.0f,   0.0f, -1.0f,  0.0f,
+        -(width / 2.0f), -(height / 2.0f), -(depth / 2.0f),  0.0f, 1.0f,   0.0f, -1.0f,  0.0f,
 
-        -(width / 2.0f),  (height / 2.0f), -(depth / 2.0f),  0.0f, 1.0f,  0.0f,  1.0f,  0.0f,
-         (width / 2.0f),  (height / 2.0f), -(depth / 2.0f),  1.0f, 1.0f,  0.0f,  1.0f,  0.0f,
-         (width / 2.0f),  (height / 2.0f),  (depth / 2.0f),  1.0f, 0.0f,  0.0f,  1.0f,  0.0f,
-         (width / 2.0f),  (height / 2.0f),  (depth / 2.0f),  1.0f, 0.0f,  0.0f,  1.0f,  0.0f,
-        -(width / 2.0f),  (height / 2.0f),  (depth / 2.0f),  0.0f, 0.0f,  0.0f,  1.0f,  0.0f,
-        -(width / 2.0f),  (height / 2.0f), -(depth / 2.0f),  0.0f, 1.0f,  0.0f,  1.0f,  0.0f
+        -(width / 2.0f),  (height / 2.0f), -(depth / 2.0f),  0.0f, 1.0f,   0.0f,  1.0f,  0.0f,
+         (width / 2.0f),  (height / 2.0f),  (depth / 2.0f),  1.0f, 0.0f,   0.0f,  1.0f,  0.0f,
+         (width / 2.0f),  (height / 2.0f), -(depth / 2.0f),  1.0f, 1.0f,   0.0f,  1.0f,  0.0f,
+         (width / 2.0f),  (height / 2.0f),  (depth / 2.0f),  1.0f, 0.0f,   0.0f,  1.0f,  0.0f,
+        -(width / 2.0f),  (height / 2.0f), -(depth / 2.0f),  0.0f, 1.0f,   0.0f,  1.0f,  0.0f,
+        -(width / 2.0f),  (height / 2.0f),  (depth / 2.0f),  0.0f, 0.0f,   0.0f,  1.0f,  0.0f
       };
 
       mesh = new Mesh(vertices);
@@ -434,6 +434,25 @@ namespace VisualKey {
 
     ~Light() {
       DestroyLightSource(this.id);
+    }
+
+  }
+
+  public class Text {
+
+    public string text;
+    public Color color;
+
+    [MethodImplAttribute(MethodImplOptions.InternalCall)]
+    private extern static void RenderText(string text, float scale, Vec3 color);
+
+    public Text(string text, Color color) {
+      this.text = text;
+      this.color = color;
+    }
+
+    public void Draw(float scale) {
+      RenderText(this.text, scale, new Vec3(this.color.color));
     }
 
   }

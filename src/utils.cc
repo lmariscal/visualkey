@@ -1,5 +1,6 @@
 #include "utils.h"
 
+#include <algorithm>
 #if defined(WIN32) || defined(_WIN32)
 #include <windows.h>
 #elif defined(__linux__)
@@ -11,21 +12,22 @@
 namespace visualkey {
 
   std::string
-  ExePath() {
+  DistPath() {
 #if defined(WIN32) || defined(_WIN32)
-    char buffer[MAX_PATH];
-    GetModuleFileName(nullptr, buffer, MAX_PATH);
-    std::string::size_type pos = std::string(buffer).find_last_of("\\/");
-    return std::string(buffer).substr(0, pos);
+    char result_char[MAX_PATH];
+    GetModuleFileName(nullptr, result_char, MAX_PATH);
 #elif defined(__linux__)
-    char result[PATH_MAX];
-    ssize_t count = readlink("/proc/self/exe", result, PATH_MAX);
-    const char *path;
-    std::string::size_type pos = std::string(result).find_last_of("\\/");
-    return std::string(result).substr(0, pos);
+    char result_char[PATH_MAX];
+    ssize_t count = readlink("/proc/self/exe", result_char, PATH_MAX);
 #else
-    std::cerr << "Unsupported OS for ExePath\n";
+    std::cerr << "Unsupported OS for DistPath\n";
 #endif
+    std::string result = std::string(result_char);
+    std::replace(result.begin(), result.end(), '\\', '/');
+    std::string substr         = std::string("dist/bin");
+    std::string::size_type pos = std::string(result).find(substr);
+    result                     = result.substr(0, pos + 4);
+    return result;
   }
 
 }

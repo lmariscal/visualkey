@@ -10,6 +10,7 @@
 #include "image.h"
 #include "audio.h"
 #include "light.h"
+#include "text.h"
 
 using namespace visualkey;
 
@@ -51,6 +52,7 @@ RunProject(const std::string &dir) {
   }
 
   InitGFX();
+  InitText();
   InitAudio(dir);
   InitMono();
 
@@ -163,6 +165,7 @@ void main() {\
   MonoStop();
   TerminateAudio();
   TerminateMono();
+  TerminateText();
   TerminateGFX();
   delete uber;
 }
