@@ -239,4 +239,10 @@ namespace visualkey {
     glUniform1i(location, val);
   }
 
+  void
+  SetFloat(ShaderData *data, i32 location, f32 val) {
+    DrawShader(data);
+    glUniform1f(location, val);
+  }
+
 }

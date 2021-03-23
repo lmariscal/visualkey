@@ -1,4 +1,5 @@
 #include "image.h"
+#include "shader.h"
 
 #define STB_IMAGE_IMPLEMENTATION
 #include <stb_image.h>
@@ -25,6 +26,9 @@ namespace visualkey {
     glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR);
     glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
 
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
+
     glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, width, height, 0, GL_RGB, GL_UNSIGNED_BYTE, data);
     glGenerateMipmap(GL_TEXTURE_2D);
 
@@ -44,10 +48,15 @@ namespace visualkey {
 
   void
   DrawImage(ImageData *data) {
+    ShaderData *shader = GetCurrentShader();
+    i32 color_loc      = GetLocation(shader, "Color");
+
     if (!data) {
       glBindTexture(GL_TEXTURE_2D, 0);
       return;
     }
+    v4 identity = { 0.0f, 0.0f, 0.0f, 0.0f };
+    SetVec4(shader, color_loc, identity);
     glBindTexture(GL_TEXTURE_2D, data->texture);
   }
 

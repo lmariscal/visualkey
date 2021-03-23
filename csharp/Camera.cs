@@ -77,6 +77,10 @@ namespace VisualKey {
       this.front = front;
     }
 
+    public void SetShader(Shader shader) {
+      this.shader = shader;
+    }
+
     public Mat4 GetView() {
       return this.view;
     }
@@ -91,6 +95,13 @@ namespace VisualKey {
       shader.Draw();
       var viewLoc = shader.GetLocation("View");
       shader.SetMat4(viewLoc, view);
+    }
+
+    public static void SetNone() {
+      Shader shader = Shader.GetUberShader();
+      shader.Draw();
+      var viewLoc = shader.GetLocation("View");
+      shader.SetMat4(viewLoc, Mat4.identity());
     }
 
   }

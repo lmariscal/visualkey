@@ -9,6 +9,7 @@ set(VISUALKEY_SOURCES
   image.cc
   audio.cc
   utils.cc
+  light.cc
 )
 
 if(NOT DEFINED OpenGL_GL_PREFERENCE)

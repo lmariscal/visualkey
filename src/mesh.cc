@@ -91,7 +91,7 @@ namespace visualkey {
   MeshData *
   CreateMesh(const std::vector<f32> &vertices, bool is_line) {
     std::vector<u32> indices;
-    for (int i = 0; i < vertices.size() / 5; ++i)
+    for (int i = 0; i < vertices.size() / 8; ++i)
       indices.push_back(i);
     return CreateMesh(vertices, indices, is_line);
   }
@@ -117,9 +117,11 @@ namespace visualkey {
     glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, data->vbo_element);
 
     glEnableVertexAttribArray(0);
-    glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, sizeof(f32) * 5, (void *)0);
+    glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, sizeof(f32) * 8, (void *)0);
     glEnableVertexAttribArray(1);
-    glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, sizeof(f32) * 5, (void *)(3 * sizeof(f32)));
+    glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, sizeof(f32) * 8, (void *)(3 * sizeof(f32)));
+    glEnableVertexAttribArray(2);
+    glVertexAttribPointer(2, 3, GL_FLOAT, GL_FALSE, sizeof(f32) * 8, (void *)(5 * sizeof(f32)));
 
     ShaderData *shader = GetCurrentShader();
     if (shader->program == GetUberShader()) {

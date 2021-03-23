@@ -29,6 +29,7 @@ namespace visualkey {
   void DrawShader(ShaderData *data);
   void TerminateShader();
   void SetInt(ShaderData *data, i32 location, i32 val);
+  void SetFloat(ShaderData *data, i32 location, f32 val);
   void SetVec2(ShaderData *data, i32 location, v2 &vec);
   void SetVec3(ShaderData *data, i32 location, v3 &vec);
   void SetVec4(ShaderData *data, i32 location, v4 &vec);

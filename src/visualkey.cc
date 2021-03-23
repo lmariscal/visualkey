@@ -60,8 +60,11 @@ RunProject(const std::string &dir) {
 \
 layout (location = 0) in vec3 vPos;\
 layout (location = 1) in vec2 vTexCoord;\
+layout (location = 2) in vec3 vNormal;\
 \
 out vec2 TexCoord;\
+out vec3 Normal;\
+out vec3 FragPos;\
 \
 uniform mat4 Projection;\
 uniform mat4 View;\
@@ -69,23 +72,33 @@ uniform mat4 Model;\
 \
 void main() {\
   gl_Position = Projection * View * Model * vec4(vPos, 1.0);\
+\
+  FragPos = vec3(Model * vec4(vPos, 1.0));\
   TexCoord = vTexCoord;\
+  Normal = vNormal;\
 }\
   ",
     "\
 #version 330 core\n\
 \
 in vec2 TexCoord;\
+in vec3 Normal;\
+in vec3 FragPos;\
 \
 uniform bool IsTexture;\
 uniform vec4 Color;\
+uniform vec3 LightPos;\
 uniform sampler2D Texture;\
+uniform float AmbientLight;\
 \
 void main() {\
-  if (IsTexture)\
-    gl_FragColor = texture(Texture, TexCoord);\
-  else\
-    gl_FragColor = vec4(Color);\
+  vec4 result = texture(Texture, TexCoord) + Color;\
+\
+  result.xyz *= AmbientLight;\
+  vec3 norm = normalize(Normal);\
+  vec3 lightDir = normalize(LightPos - FragPos);\
+\
+  gl_FragColor = result;\
 }\
   ");
   ShaderData *uber = CreateShader(uber_source);
@@ -93,12 +106,10 @@ void main() {\
   SetUberShader(uber);
 
   // i32 perspective_loc = GetLocation(uber, "Perspective");
-  i32 color_loc = GetLocation(uber, "Color");
-  i32 model_loc = GetLocation(uber, "Model");
-  i32 view_loc  = GetLocation(uber, "View");
-
-  m4 test_view = lookAtLH(vec3(0, 0, -10), vec3(0, 0, 0), vec3(0, 1, 0));
-  std::cout << "test_view:\n" << to_string(test_view) << '\n';
+  i32 color_loc         = GetLocation(uber, "Color");
+  i32 model_loc         = GetLocation(uber, "Model");
+  i32 view_loc          = GetLocation(uber, "View");
+  i32 ambient_light_loc = GetLocation(uber, "AmbientLight");
 
   MonoCompile(dir);
   MonoStart();
@@ -125,7 +136,7 @@ void main() {\
 
     DrawShader(uber);
     // SetMat4(uber, perspective_loc, perspective);
-    SetMat4(uber, model_loc, m4_indentity);
+    SetFloat(uber, ambient_light_loc, 1.0f);
     SetMat4(uber, view_loc, m4_indentity);
     SetVec4(uber, color_loc, default_color);
 

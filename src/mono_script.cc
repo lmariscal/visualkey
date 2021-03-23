@@ -13,6 +13,7 @@
 #include "image.h"
 #include "utils.h"
 #include "audio.h"
+#include "light.h"
 
 #if defined(WIN32) || defined(_WIN32)
 #include <windows.h>
@@ -704,9 +705,7 @@ namespace visualkey {
   void
   DrawTextureMono(MonoObject *obj) {
     ShaderData *shader = GetCurrentShader();
-    i32 is_texture_loc = GetLocation(shader, "IsTexture", false);
-    SetInt(shader, is_texture_loc, 1);
-    ImageData *image = ToImageData(obj);
+    ImageData *image   = ToImageData(obj);
     DrawImage(image);
     delete image;
   }
@@ -714,18 +713,14 @@ namespace visualkey {
   void
   SetNoneTexture() {
     ShaderData *shader = GetCurrentShader();
-    i32 is_texture_loc = GetLocation(shader, "IsTexture", false);
-    SetInt(shader, is_texture_loc, 0);
     DrawImage(nullptr);
   }
 
   void
   DrawColorMono(MonoObject *obj) {
     ShaderData *shader = GetCurrentShader();
-    i32 is_texture_loc = GetLocation(shader, "IsTexture");
     i32 color_loc      = GetLocation(shader, "Color", false);
-    SetInt(shader, is_texture_loc, 0);
-    v4 color = ToVec4(obj);
+    v4 color           = ToVec4(obj);
     SetVec4(shader, color_loc, color);
   }
 
@@ -799,6 +794,13 @@ namespace visualkey {
   ShaderSetInt(MonoObject *obj, i32 location, i32 val) {
     ShaderData *shader = ToShaderData(obj);
     SetInt(shader, location, val);
+    delete shader;
+  }
+
+  void
+  ShaderSetFloat(MonoObject *obj, i32 location, f32 val) {
+    ShaderData *shader = ToShaderData(obj);
+    SetFloat(shader, location, val);
     delete shader;
   }
 
@@ -943,6 +945,9 @@ namespace visualkey {
     mono_add_internal_call("VisualKey.Mesh::RotateY", (const void *)RotateYMesh);
     mono_add_internal_call("VisualKey.Mesh::RotateZ", (const void *)RotateZMesh);
 
+    mono_add_internal_call("VisualKey.Light::EnableLightSystem", (const void *)EnableLightSystem);
+    mono_add_internal_call("VisualKey.Light::DisableLightSystem", (const void *)DisableLightSystem);
+
     mono_add_internal_call("VisualKey.Stash::NewStash", (const void *)NewStash);
     mono_add_internal_call("VisualKey.Stash::PopStash", (const void *)PopStash);
 
@@ -974,6 +979,7 @@ namespace visualkey {
     mono_add_internal_call("VisualKey.Shader::DrawShader", (const void *)DrawShaderMono);
     mono_add_internal_call("VisualKey.Shader::GetLocation", (const void *)ShaderGetLocation);
     mono_add_internal_call("VisualKey.Shader::SetInt", (const void *)ShaderSetInt);
+    mono_add_internal_call("VisualKey.Shader::SetFloat", (const void *)ShaderSetFloat);
     mono_add_internal_call("VisualKey.Shader::SetVec2", (const void *)ShaderSetVec2);
     mono_add_internal_call("VisualKey.Shader::SetVec3", (const void *)ShaderSetVec3);
     mono_add_internal_call("VisualKey.Shader::SetVec4", (const void *)ShaderSetVec4);

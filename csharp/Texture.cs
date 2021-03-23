@@ -17,8 +17,11 @@ namespace VisualKey {
     [MethodImplAttribute(MethodImplOptions.InternalCall)]
     private extern static void SetNoneTexture();
 
+    private static Color color = new Color(255, 255, 255);
+
     static public void SetNone() {
       SetNoneTexture();
+      color.Draw();
     }
 
     public Texture(string path) {

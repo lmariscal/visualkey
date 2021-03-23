@@ -78,8 +78,8 @@ namespace VisualKey {
 
     private void CreateLine(float p0x, float p0y, float p1x, float p1y) {
       float[] vertices = {
-        p0x, p0y, 0.0f, 0.0f, 0.0f,
-        p1x, p1y, 0.0f, 0.0f, 0.0f
+        p0x, p0y, 0.0f,  0.0f, 0.0f,  0.0f, 0.0f, 0.0f,
+        p1x, p1y, 0.0f,  0.0f, 0.0f,  0.0f, 0.0f, 0.0f
       };
       mesh = new Mesh(vertices, true);
     }
@@ -102,10 +102,10 @@ namespace VisualKey {
 
     public Rectangle(float width, float height) {
       float[] vertices = {
-         (width / 2.0f),  (height / 2.0f), 0.0f,  1.0f, 1.0f,
-         (width / 2.0f), -(height / 2.0f), 0.0f,  1.0f, 0.0f,
-        -(width / 2.0f), -(height / 2.0f), 0.0f,  0.0f, 0.0f,
-        -(width / 2.0f),  (height / 2.0f), 0.0f,  0.0f, 1.0f
+         (width / 2.0f),  (height / 2.0f), 0.0f,  1.0f, 1.0f,  0.0f, 0.0f, 0.0f,
+         (width / 2.0f), -(height / 2.0f), 0.0f,  1.0f, 0.0f,  0.0f, 0.0f, 0.0f,
+        -(width / 2.0f), -(height / 2.0f), 0.0f,  0.0f, 0.0f,  0.0f, 0.0f, 0.0f,
+        -(width / 2.0f),  (height / 2.0f), 0.0f,  0.0f, 1.0f,  0.0f, 0.0f, 0.0f
       };
       uint[] indices = {
         0, 1, 3,
@@ -124,9 +124,9 @@ namespace VisualKey {
 
     public Triangle(float x1, float y1, float x2, float y2, float x3, float y3) {
       float[] vertices = {
-        x1, y1, 0.0f,  0.5f, 1.0f,
-        x2, y2, 0.0f,  0.0f, 0.0f,
-        x3, y3, 0.0f,  1.0f, 0.0f,
+        x1, y1, 0.0f,  0.5f, 1.0f,  0.0f, 0.0f, 0.0f,
+        x2, y2, 0.0f,  0.0f, 0.0f,  0.0f, 0.0f, 0.0f,
+        x3, y3, 0.0f,  1.0f, 0.0f,  0.0f, 0.0f, 0.0f
       };
       mesh = new Mesh(vertices);
     }
@@ -141,10 +141,10 @@ namespace VisualKey {
 
     public Quad(float x1, float y1, float x2, float y2, float x3, float y3, float x4, float y4) {
       float[] vertices = {
-        x1, y1, 0.0f,  1.0f, 1.0f,
-        x2, y2, 0.0f,  1.0f, 0.0f,
-        x3, y3, 0.0f,  0.0f, 0.0f,
-        x4, y4, 0.0f,  0.0f, 1.0f
+        x1, y1, 0.0f,  1.0f, 1.0f,  0.0f, 0.0f, 0.0f,
+        x2, y2, 0.0f,  1.0f, 0.0f,  0.0f, 0.0f, 0.0f,
+        x3, y3, 0.0f,  0.0f, 0.0f,  0.0f, 0.0f, 0.0f,
+        x4, y4, 0.0f,  0.0f, 1.0f,  0.0f, 0.0f, 0.0f
       };
       uint[] indices = {
         0, 1, 3,
@@ -162,30 +162,32 @@ namespace VisualKey {
     public Mesh mesh { get; private set; }
 
     public Circle(float radius, uint steps) {
-      float[] vertices = new float[(steps + 1) * 5];
+      float[] vertices = new float[(steps + 1) * 8];
       uint[] indices = new uint[steps * 3];
 
-      for (int n = 0; n < (steps + 1) * 5; ++n)
+      for (int n = 0; n < (steps + 1) * 8; ++n)
         vertices[n] = 0.0f;
 
       vertices[3] = 0.5f;
       vertices[4] = 0.5f;
 
-      Console.WriteLine("Here?");
       var increment = 2.0f * MathF.PI / (steps - 1);
       var i = 1;
       for (float angle = 0.0f; angle <= 2.0f * MathF.PI; angle += increment) {
         var x = (radius * MathF.Cos(angle)) / 2.0f;
         var y = (radius * MathF.Sin(angle)) / 2.0f;
-        vertices[(i * 5)] = x;
-        vertices[(i * 5) + 1] = y;
+        vertices[(i * 8)] = x;
+        vertices[(i * 8) + 1] = y;
         var tx = (x + (radius / 2.0f)) / radius;
         var ty = (y + (radius / 2.0f)) / radius;
-        vertices[(i * 5) + 3] = tx;
-        vertices[(i * 5) + 4] = ty;
+        vertices[(i * 8) + 3] = tx;
+        vertices[(i * 8) + 4] = ty;
+
+        vertices[(i * 8) + 5] = 0.0f;
+        vertices[(i * 8) + 6] = 0.0f;
+        vertices[(i * 8) + 7] = 0.0f;
         i++;
       }
-      Console.WriteLine("Here?");
 
       for (uint n = 0; n < steps - 1; ++n) {
         indices[(n * 3)] = 0;
@@ -208,47 +210,47 @@ namespace VisualKey {
 
     public Cube(float width, float height, float depth) {
       float[] vertices = {
-        -(width / 2.0f), -(height / 2.0f), -(depth / 2.0f),  0.0f, 0.0f,
-         (width / 2.0f), -(height / 2.0f), -(depth / 2.0f),  1.0f, 0.0f,
-         (width / 2.0f),  (height / 2.0f), -(depth / 2.0f),  1.0f, 1.0f,
-         (width / 2.0f),  (height / 2.0f), -(depth / 2.0f),  1.0f, 1.0f,
-        -(width / 2.0f),  (height / 2.0f), -(depth / 2.0f),  0.0f, 1.0f,
-        -(width / 2.0f), -(height / 2.0f), -(depth / 2.0f),  0.0f, 0.0f,
+        -(width / 2.0f), -(height / 2.0f), -(depth / 2.0f),  0.0f, 0.0f,  0.0f,  0.0f, -1.0f,
+         (width / 2.0f), -(height / 2.0f), -(depth / 2.0f),  1.0f, 0.0f,  0.0f,  0.0f, -1.0f,
+         (width / 2.0f),  (height / 2.0f), -(depth / 2.0f),  1.0f, 1.0f,  0.0f,  0.0f, -1.0f,
+         (width / 2.0f),  (height / 2.0f), -(depth / 2.0f),  1.0f, 1.0f,  0.0f,  0.0f, -1.0f,
+        -(width / 2.0f),  (height / 2.0f), -(depth / 2.0f),  0.0f, 1.0f,  0.0f,  0.0f, -1.0f,
+        -(width / 2.0f), -(height / 2.0f), -(depth / 2.0f),  0.0f, 0.0f,  0.0f,  0.0f, -1.0f,
 
-        -(width / 2.0f), -(height / 2.0f),  (depth / 2.0f),  0.0f, 0.0f,
-         (width / 2.0f), -(height / 2.0f),  (depth / 2.0f),  1.0f, 0.0f,
-         (width / 2.0f),  (height / 2.0f),  (depth / 2.0f),  1.0f, 1.0f,
-         (width / 2.0f),  (height / 2.0f),  (depth / 2.0f),  1.0f, 1.0f,
-        -(width / 2.0f),  (height / 2.0f),  (depth / 2.0f),  0.0f, 1.0f,
-        -(width / 2.0f), -(height / 2.0f),  (depth / 2.0f),  0.0f, 0.0f,
+        -(width / 2.0f), -(height / 2.0f),  (depth / 2.0f),  0.0f, 0.0f,  0.0f,  0.0f, 1.0f,
+         (width / 2.0f), -(height / 2.0f),  (depth / 2.0f),  1.0f, 0.0f,  0.0f,  0.0f, 1.0f,
+         (width / 2.0f),  (height / 2.0f),  (depth / 2.0f),  1.0f, 1.0f,  0.0f,  0.0f, 1.0f,
+         (width / 2.0f),  (height / 2.0f),  (depth / 2.0f),  1.0f, 1.0f,  0.0f,  0.0f, 1.0f,
+        -(width / 2.0f),  (height / 2.0f),  (depth / 2.0f),  0.0f, 1.0f,  0.0f,  0.0f, 1.0f,
+        -(width / 2.0f), -(height / 2.0f),  (depth / 2.0f),  0.0f, 0.0f,  0.0f,  0.0f, 1.0f,
 
-        -(width / 2.0f),  (height / 2.0f),  (depth / 2.0f),  1.0f, 0.0f,
-        -(width / 2.0f),  (height / 2.0f), -(depth / 2.0f),  1.0f, 1.0f,
-        -(width / 2.0f), -(height / 2.0f), -(depth / 2.0f),  0.0f, 1.0f,
-        -(width / 2.0f), -(height / 2.0f), -(depth / 2.0f),  0.0f, 1.0f,
-        -(width / 2.0f), -(height / 2.0f),  (depth / 2.0f),  0.0f, 0.0f,
-        -(width / 2.0f),  (height / 2.0f),  (depth / 2.0f),  1.0f, 0.0f,
+        -(width / 2.0f),  (height / 2.0f),  (depth / 2.0f),  1.0f, 0.0f,  -1.0f,  0.0f,  0.0f,
+        -(width / 2.0f),  (height / 2.0f), -(depth / 2.0f),  1.0f, 1.0f,  -1.0f,  0.0f,  0.0f,
+        -(width / 2.0f), -(height / 2.0f), -(depth / 2.0f),  0.0f, 1.0f,  -1.0f,  0.0f,  0.0f,
+        -(width / 2.0f), -(height / 2.0f), -(depth / 2.0f),  0.0f, 1.0f,  -1.0f,  0.0f,  0.0f,
+        -(width / 2.0f), -(height / 2.0f),  (depth / 2.0f),  0.0f, 0.0f,  -1.0f,  0.0f,  0.0f,
+        -(width / 2.0f),  (height / 2.0f),  (depth / 2.0f),  1.0f, 0.0f,  -1.0f,  0.0f,  0.0f,
 
-         (width / 2.0f),  (height / 2.0f),  (depth / 2.0f),  1.0f, 0.0f,
-         (width / 2.0f),  (height / 2.0f), -(depth / 2.0f),  1.0f, 1.0f,
-         (width / 2.0f), -(height / 2.0f), -(depth / 2.0f),  0.0f, 1.0f,
-         (width / 2.0f), -(height / 2.0f), -(depth / 2.0f),  0.0f, 1.0f,
-         (width / 2.0f), -(height / 2.0f),  (depth / 2.0f),  0.0f, 0.0f,
-         (width / 2.0f),  (height / 2.0f),  (depth / 2.0f),  1.0f, 0.0f,
+         (width / 2.0f),  (height / 2.0f),  (depth / 2.0f),  1.0f, 0.0f,  1.0f,  0.0f,  0.0f,
+         (width / 2.0f),  (height / 2.0f), -(depth / 2.0f),  1.0f, 1.0f,  1.0f,  0.0f,  0.0f,
+         (width / 2.0f), -(height / 2.0f), -(depth / 2.0f),  0.0f, 1.0f,  1.0f,  0.0f,  0.0f,
+         (width / 2.0f), -(height / 2.0f), -(depth / 2.0f),  0.0f, 1.0f,  1.0f,  0.0f,  0.0f,
+         (width / 2.0f), -(height / 2.0f),  (depth / 2.0f),  0.0f, 0.0f,  1.0f,  0.0f,  0.0f,
+         (width / 2.0f),  (height / 2.0f),  (depth / 2.0f),  1.0f, 0.0f,  1.0f,  0.0f,  0.0f,
 
-        -(width / 2.0f), -(height / 2.0f), -(depth / 2.0f),  0.0f, 1.0f,
-         (width / 2.0f), -(height / 2.0f), -(depth / 2.0f),  1.0f, 1.0f,
-         (width / 2.0f), -(height / 2.0f),  (depth / 2.0f),  1.0f, 0.0f,
-         (width / 2.0f), -(height / 2.0f),  (depth / 2.0f),  1.0f, 0.0f,
-        -(width / 2.0f), -(height / 2.0f),  (depth / 2.0f),  0.0f, 0.0f,
-        -(width / 2.0f), -(height / 2.0f), -(depth / 2.0f),  0.0f, 1.0f,
+        -(width / 2.0f), -(height / 2.0f), -(depth / 2.0f),  0.0f, 1.0f,  0.0f, -1.0f,  0.0f,
+         (width / 2.0f), -(height / 2.0f), -(depth / 2.0f),  1.0f, 1.0f,  0.0f, -1.0f,  0.0f,
+         (width / 2.0f), -(height / 2.0f),  (depth / 2.0f),  1.0f, 0.0f,  0.0f, -1.0f,  0.0f,
+         (width / 2.0f), -(height / 2.0f),  (depth / 2.0f),  1.0f, 0.0f,  0.0f, -1.0f,  0.0f,
+        -(width / 2.0f), -(height / 2.0f),  (depth / 2.0f),  0.0f, 0.0f,  0.0f, -1.0f,  0.0f,
+        -(width / 2.0f), -(height / 2.0f), -(depth / 2.0f),  0.0f, 1.0f,  0.0f, -1.0f,  0.0f,
 
-        -(width / 2.0f),  (height / 2.0f), -(depth / 2.0f),  0.0f, 1.0f,
-         (width / 2.0f),  (height / 2.0f), -(depth / 2.0f),  1.0f, 1.0f,
-         (width / 2.0f),  (height / 2.0f),  (depth / 2.0f),  1.0f, 0.0f,
-         (width / 2.0f),  (height / 2.0f),  (depth / 2.0f),  1.0f, 0.0f,
-        -(width / 2.0f),  (height / 2.0f),  (depth / 2.0f),  0.0f, 0.0f,
-        -(width / 2.0f),  (height / 2.0f), -(depth / 2.0f),  0.0f, 1.0f
+        -(width / 2.0f),  (height / 2.0f), -(depth / 2.0f),  0.0f, 1.0f,  0.0f,  1.0f,  0.0f,
+         (width / 2.0f),  (height / 2.0f), -(depth / 2.0f),  1.0f, 1.0f,  0.0f,  1.0f,  0.0f,
+         (width / 2.0f),  (height / 2.0f),  (depth / 2.0f),  1.0f, 0.0f,  0.0f,  1.0f,  0.0f,
+         (width / 2.0f),  (height / 2.0f),  (depth / 2.0f),  1.0f, 0.0f,  0.0f,  1.0f,  0.0f,
+        -(width / 2.0f),  (height / 2.0f),  (depth / 2.0f),  0.0f, 0.0f,  0.0f,  1.0f,  0.0f,
+        -(width / 2.0f),  (height / 2.0f), -(depth / 2.0f),  0.0f, 1.0f,  0.0f,  1.0f,  0.0f
       };
 
       mesh = new Mesh(vertices);
@@ -269,7 +271,7 @@ namespace VisualKey {
       ArrayList indices = new ArrayList();
 
       float x, y, z, xy;
-      // float nx, ny, nz, lengthInv = 1.0f / radius;
+      float nx, ny, nz, lengthInv = 1.0f / radius;
       float u, v;
 
       float sectorStep = 2.0f * MathF.PI / sectors;
@@ -290,17 +292,17 @@ namespace VisualKey {
           vertices.Add(y);
           vertices.Add(z);
 
-          // nx = x * lengthInv;
-          // ny = y * lengthInv;
-          // nz = z * lengthInv;
-          // vertices.add(nx);
-          // vertices.add(ny);
-          // vertices.add(nz);
-
           u = (float)j / sectors;
           v = (float)i / stacks;
           vertices.Add(u);
           vertices.Add(v);
+
+          nx = x * lengthInv;
+          ny = y * lengthInv;
+          nz = z * lengthInv;
+          vertices.Add(nx);
+          vertices.Add(ny);
+          vertices.Add(nz);
         }
       }
 
@@ -388,6 +390,23 @@ namespace VisualKey {
         Line l = new Line(bezierSteps[i], bezierSteps[i + 1]);
         l.Draw();
       }
+    }
+
+  }
+
+  public class Light {
+
+    [MethodImplAttribute(MethodImplOptions.InternalCall)]
+    private extern static void EnableLightSystem();
+    [MethodImplAttribute(MethodImplOptions.InternalCall)]
+    private extern static void DisableLightSystem();
+
+    public static void Enable() {
+      EnableLightSystem();
+    }
+
+    public static void Disable() {
+      DisableLightSystem();
     }
 
   }
