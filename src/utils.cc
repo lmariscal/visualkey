@@ -24,9 +24,9 @@ namespace visualkey {
 #endif
     std::string result = std::string(result_char);
     std::replace(result.begin(), result.end(), '\\', '/');
-    std::string substr         = std::string("dist/bin");
+    std::string substr         = std::string("/bin/");
     std::string::size_type pos = std::string(result).find(substr);
-    result                     = result.substr(0, pos + 4);
+    result                     = result.substr(0, pos);
     return result;
   }
 

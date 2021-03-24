@@ -55,9 +55,9 @@ namespace visualkey {
 
     std::string name;
 
-    if (dir == ".") name = std::filesystem::current_path().filename();
+    if (dir == ".") name = std::filesystem::current_path().filename().string();
     else
-      name = std::filesystem::path(dir).filename();
+      name = std::filesystem::path(dir).filename().string();
 
     auto deleteIfExists = [](const std::string path) {
       if (std::filesystem::exists(path)) std::filesystem::remove(path);
@@ -121,13 +121,13 @@ namespace visualkey {
 
 #if defined(WIN32) || defined(_WIN32)
 #if defined(VISUALKEY_DEBUG)
-    std::string command = DistPath() + "/mono/mcs " + path + "*.cs /out:" + path +
-      ".vsk/App.dll /target:library /debug /optimize /w:4 /nologo /reference:" + DistPath() +
-      "/api/Debug/VisualKey.dll";
+    std::string command = "\"\"" + DistPath() + "/mono/mcs.bat\" " + path + "*.cs /out:" + path +
+      ".vsk/App.dll /target:library /debug /optimize /w:4 /nologo /reference:\"" + DistPath() +
+      "/api/Debug/VisualKey.dll\"\"";
 #else
-    std::string command = DistPath() + "/mono/mcs " + path + "*.cs /out:" + path +
-      ".vsk/App.dll /target:library /debug /optimize /w:4 /nologo /reference:" + DistPath() +
-      "/api/Release/VisualKey.dll";
+    std::string command = "\"\"" + DistPath() + "\\mono\\mcs\" " + path + "*.cs /out:" + path +
+      ".vsk/App.dll /target:library /debug /optimize /w:4 /nologo /reference:\"" + DistPath() +
+      "/api/Release/VisualKey.dll\"\"";
 #endif
     i32 ret = system(command.c_str());
     if (ret != 0) {
@@ -138,12 +138,12 @@ namespace visualkey {
 #elif defined(__linux__)
 #if defined(VISUALKEY_DEBUG)
     std::string command = "mcs " + path + "*.cs /out:" + path +
-      ".vsk/App.dll /target:library /debug /optimize /w:4 /nologo /reference:" + DistPath() +
-      "/api/Debug/VisualKey.dll";
+      ".vsk/App.dll /target:library /debug /optimize /w:4 /nologo /reference:\"" + DistPath() +
+      "/api/Debug/VisualKey.dll\"";
 #else
     std::string command = "mcs " + path + "*.cs /out:" + path +
-      ".vsk/App.dll /target:library /debug /optimize /w:4 /nologo /reference:" + DistPath() +
-      "/api/Release/VisualKey.dll";
+      ".vsk/App.dll /target:library /debug /optimize /w:4 /nologo /reference:\"" + DistPath() +
+      "/api/Release/VisualKey.dll\"";
 #endif
     i32 ret = system(command.c_str());
     if (ret != 0) {

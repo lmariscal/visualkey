@@ -1,0 +1,93 @@
+name: Make Installers
+on:
+  push:
+    tags:
+    - '*'
+jobs:
+  release:
+    runs-on: ${{ matrix.os }}
+    strategy:
+      fail-fast: true
+      matrix:
+        os: [ubuntu-latest, windows-latest]
+    steps:
+      - uses: actions/checkout@v2
+      - name: Install Dependencies
+        shell: bash
+        env:
+          GITHUB_OS: ${{ matrix.os }}
+        run: |
+          git submodule update --init --recursive
+          if [ "$GITHUB_OS" == "ubuntu-latest" ];
+          then
+            sudo apt-get -y update
+            sudo apt-get -y install build-essential libglu1-mesa libglu1-mesa-dev libgl1-mesa-glx libgl1-mesa-dev xorg-dev libx11-dev cmake unzip rpm ninja-build
+          elif [ "$GITHUB_OS" == "windows-latest" ];
+          then
+            choco install --yes --verbose curl
+            choco install --yes --verbose 7zip
+          fi
+          curl -o irrKlang.zip "https://www.ambiera.at/downloads/irrKlang-64bit-1.6.0.zip"
+          if [ "$GITHUB_OS" == "ubuntu-latest" ];
+          then
+            unzip irrKlang.zip -d third/irrklang
+          elif [ "$GITHUB_OS" == "windows-latest" ];
+          then
+            7z x irrKlang.zip -y -othird/irrklang -r
+          fi
+          mv third/irrklang/irrKlang-64bit-1.6.0/* third/irrklang
+      - name: Add msbuild to PATH
+        if: startsWith(matrix.os,'windows')
+        uses: microsoft/setup-msbuild@v1
+      - name: Setup Mono
+        shell: bash
+        env:
+          GITHUB_OS: ${{ matrix.os }}
+        run: |
+          if [ "$GITHUB_OS" == "ubuntu-latest" ];
+          then
+            sudo apt-get -y install dirmngr gnupg apt-transport-https ca-certificates software-properties-common
+            sudo apt-key adv --keyserver hkp://keyserver.ubuntu.com:80 --recv-keys 3FA7E0328081BFF6A14DA29AA6A19B38D3D831EF
+            sudo apt-add-repository 'deb https://download.mono-project.com/repo/ubuntu stable-focal main'
+            sudo apt-get -y update
+            sudo apt-get -y install mono-complete
+            mono --version
+          elif [ "$GITHUB_OS" == "windows-latest" ];
+          then
+            choco install --yes --verbose mono
+          fi
+      - uses: ilammy/msvc-dev-cmd@v1
+        if: startsWith(matrix.os,'windows')
+      - name: Build Release
+        shell: bash
+        env:
+          GITHUB_OS: ${{ matrix.os }}
+        run: |
+          mkdir bld
+          cd bld
+          if [ "$GITHUB_OS" == "ubuntu-latest" ];
+          then
+            cmake -G Ninja -DCMAKE_BUILD_TYPE=Release ..
+          elif [ "$GITHUB_OS" == "windows-latest" ];
+          then
+            rm /usr/bin/link
+            cmake -G "NMake Makefiles" -DCMAKE_BUILD_TYPE=Release ..
+          fi
+          cmake --build . --config Release
+      - name: Linux Packager
+        working-directory: bld
+        if: startsWith(matrix.os,'ubuntu')
+        run: |
+          sudo cpack
+      - name: Windows Packager
+        working-directory: bld
+        if: startsWith(matrix.os,'windows')
+        run: |
+          choco install --yes --verbose nsis
+          cpack
+      - name: Create Release
+        uses: softprops/action-gh-release@v1
+        with:
+          files: bld/pkg/*
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
