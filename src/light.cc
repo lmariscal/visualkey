@@ -30,6 +30,7 @@ namespace visualkey {
       lights.at(i + 1) = val[1];
       lights.at(i + 2) = val[2];
       i++;
+      if (i >= 255) { std::cerr << "Maximum number of Lights in the Uber Shader is 256\n"; }
     }
 
     SetVec3A(shader, light_sources_loc, lights);

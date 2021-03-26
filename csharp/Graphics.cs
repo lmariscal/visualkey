@@ -409,6 +409,7 @@ namespace VisualKey {
     [MethodImplAttribute(MethodImplOptions.InternalCall)]
     private extern static void ChangePosition(uint id, Vec3 position);
 
+    private bool _destroyed = false;
     private Vec3 _position;
     public Vec3 position {
       get {
@@ -432,8 +433,14 @@ namespace VisualKey {
       this.id = CreateLightSource(pos);
     }
 
-    ~Light() {
+    public void Destroy() {
+      if (_destroyed) return;
       DestroyLightSource(this.id);
+      _destroyed = true;
+    }
+
+    ~Light() {
+      this.Destroy();
     }
 
   }

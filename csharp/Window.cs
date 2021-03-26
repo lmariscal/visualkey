@@ -59,6 +59,10 @@ namespace VisualKey {
       BackgroundWindow((uint)color.x, (uint)color.y, (uint)color.z);
     }
 
+    private static void BackgroundWindow(Color color) {
+      BackgroundWindow((uint)color.color.x * 255, (uint)color.color.y * 255, (uint)color.color.z * 255);
+    }
+
     public Window(uint width, uint height, string title = "VisualKey") {
       CreateWindow(width, height, title, this);
     }
@@ -81,6 +85,11 @@ namespace VisualKey {
     }
 
     public void Background(Vec3 color) {
+      this.MakeCurrent();
+      BackgroundWindow(color);
+    }
+
+    public void Background(Color color) {
       this.MakeCurrent();
       BackgroundWindow(color);
     }

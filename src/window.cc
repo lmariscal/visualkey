@@ -122,7 +122,9 @@ namespace visualkey {
 
   void
   GLFWErrorCallback(i32 error, const char *description) {
+#if defined(VISUALKEY_DEBUG)
     std::cerr << description << "\n";
+#endif
   }
 
   void
